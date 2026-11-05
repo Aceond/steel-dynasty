@@ -71,14 +71,15 @@
     .brand-mark .icon { width: 23px; height: 23px; }
     .brand-title { font-size: 17px; font-weight: 800; letter-spacing: 2px; line-height: 1.1; }
     .brand-sub { color: var(--muted); font-size: 9px; letter-spacing: 3px; margin-top: 5px; }
-    .resources { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .resources { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; gap: 8px; flex: 1; min-width: 0; }
     .resource-chip {
-      display: flex; align-items: center; gap: 9px; min-width: 130px;
+      display: flex; align-items: center; gap: 9px; width: 100%; min-width: 0; overflow: hidden;
       padding: 8px 12px; border: 1px solid var(--line-soft); border-radius: 9px;
       background: rgba(255,255,255,.018);
     }
     .resource-chip .icon { color: var(--muted); width: 17px; }
-    .resource-value { font-weight: 750; font-size: 14px; line-height: 1.25; }
+    .resource-value { font-weight: 750; font-size: 14px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .resource-unit { display: inline; font-size: .78em; color: var(--muted); margin-left: 2px; }
     .resource-meta { font-size: 10px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
     .resource-meta .rate { color: var(--green); margin-left: 5px; }
     .resource-chip.power .icon { color: var(--accent); }
@@ -542,7 +543,6 @@
       .region-bonus-strip { justify-content: flex-start; }
     }
     @media (max-width: 1220px) {
-      .resource-chip { min-width: 105px; }
       .resource-meta .rate { display: block; margin-left: 0; }
       .overview-grid { grid-template-columns: 1fr; }
       .overview-grid > .stack { grid-template-columns: 1fr 1fr; }
@@ -574,6 +574,7 @@
       .resources { order: 3; flex-basis: 100%; gap: 4px; }
       .resource-chip { border: 0; background: transparent; padding: 3px 5px; }
       .resource-value { font-size: 12px; }
+      .resource-unit { display: none; }
       .resource-meta { font-size: 8px; }
       .resource-meta .rate { display: inline; }
       .power-label { display: none; }
@@ -1995,7 +1996,7 @@
       const powerPct = Math.round(r.efficiency * 100);
       const powerWarn = r.demand > r.capacity;
       document.getElementById("resources").innerHTML = ["cash","steel","circuits","research"].map(res => {
-        const value = res === "cash" ? money(state[res]) : fmt(state[res]) + " " + RES[res].unit;
+        const value = res === "cash" ? money(state[res]) : fmt(state[res]) + '<span class="resource-unit">' + RES[res].unit + '</span>';
         const rate = r[res] > 0 ? '<span class="rate">+' + fmt(r[res]) + '/s</span>' : "";
         return '<div class="resource-chip">' + icon(RES[res].icon) + '<div><div class="resource-value mono">' + value + '</div><div class="resource-meta">' + RES[res].name + rate + '</div></div></div>';
       }).join("") + '<div class="resource-chip power ' + (powerWarn ? "warn" : "") + '" title="发电能力 ' + fmt(r.capacity) + ' MW / 全厂负载 ' + fmt(r.demand) + ' MW，供电效率 ' + powerPct + '%">' + icon("power") + '<div><div class="resource-value mono">' + powerPct + '%</div><div class="resource-meta"><span class="power-label">电力 </span><span class="rate">' + fmt(r.capacity) + '/' + fmt(r.demand) + ' MW</span></div></div></div>';
