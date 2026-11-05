@@ -500,7 +500,51 @@
     .achievement-reward { display: flex; flex-wrap: wrap; gap: 4px; min-height: 15px; margin-bottom: 8px; }
     .achievement-reward span { font-size: 8px; color: var(--green); background: var(--green-soft); border-radius: 3px; padding: 2px 5px; }
     .achievement-card .btn { width: 100%; }
+    .notify-wrap { position: relative; display: flex; }
+    .notify-badge { position: absolute; top: -5px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px; border: 2px solid var(--bg); border-radius: 9px; background: var(--red); color: #fff; font-size: 8px; font-weight: 800; display: grid; place-items: center; line-height: 1; }
+    .notify-badge[hidden] { display: none; }
+    .notify-panel { position: absolute; top: 46px; right: 0; width: 360px; max-height: min(480px, calc(100vh - 90px)); overflow: hidden; display: flex; flex-direction: column; background: #151b20; border: 1px solid #3b4852; border-radius: 11px; box-shadow: 0 18px 50px rgba(0,0,0,.45); z-index: 70; }
+    .notify-panel[hidden] { display: none; }
+    .notify-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 15px; border-bottom: 1px solid var(--line); }
+    .notify-title { font-size: 12px; font-weight: 800; }
+    .notify-count { color: var(--muted); font-size: 9px; margin-left: 6px; }
+    .notify-list { overflow-y: auto; padding: 5px; }
+    .notice-item { display: flex; gap: 9px; padding: 10px; border-radius: 7px; border-bottom: 1px solid var(--line-soft); }
+    .notice-item:last-child { border-bottom: 0; }
+    .notice-item.unread { background: rgba(240,161,58,.055); }
+    .notice-icon { width: 27px; height: 27px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 6px; color: var(--accent); background: var(--accent-soft); }
+    .notice-icon .icon { width: 14px; height: 14px; }
+    .notice-main { min-width: 0; flex: 1; }
+    .notice-text { font-size: 10px; line-height: 1.55; color: var(--text); }
+    .notice-time { color: var(--faint); font-size: 8px; margin-top: 4px; }
+    .notice-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 8px; flex: 0 0 auto; }
+    .notice-dot.hidden { visibility: hidden; }
+    .notify-foot { display: flex; gap: 6px; padding: 9px; border-top: 1px solid var(--line); background: rgba(255,255,255,.012); }
+    .notify-foot .btn { flex: 1; }
+    .log-summary { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 9px; margin-bottom: 13px; }
+    .log-summary-card { padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.014); }
+    .log-summary-card strong { display: block; font-size: 19px; }
+    .log-summary-card span { color: var(--muted); font-size: 9px; }
+    .log-filters { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+    .log-filter { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 5px; padding: 5px 9px; font-size: 9px; cursor: pointer; }
+    .log-filter.active { color: var(--accent); border-color: rgba(240,161,58,.32); background: var(--accent-soft); }
+    .log-filter .icon { width: 10px; height: 10px; margin-right: 3px; }
+    .log-date { display: flex; align-items: center; gap: 10px; color: var(--faint); font-size: 9px; letter-spacing: 1px; margin: 16px 0 7px; }
+    .log-date:first-child { margin-top: 0; }
+    .log-date::after { content: ""; height: 1px; flex: 1; background: var(--line-soft); }
+    .log-entry { display: grid; grid-template-columns: 52px 54px minmax(0,1fr); gap: 9px; align-items: start; padding: 9px 4px; border-bottom: 1px solid var(--line-soft); }
+    .log-entry-time { color: var(--faint); font-size: 9px; padding-top: 2px; }
+    .log-kind { display: inline-flex; align-items: center; justify-content: center; gap: 3px; border-radius: 4px; padding: 2px 5px; font-size: 8px; color: var(--muted); background: rgba(255,255,255,.035); white-space: nowrap; }
+    .log-kind .icon { width: 10px; height: 10px; }
+    .log-entry-text { font-size: 10px; line-height: 1.55; color: var(--text); }
+    .log-empty { padding: 40px 10px; text-align: center; color: var(--faint); font-size: 11px; }
 
+    @media (max-width: 680px) {
+      .notify-panel { position: absolute; top: 44px; right: 0; left: auto; width: min(360px, calc(100vw - 40px)); }
+      .log-summary { grid-template-columns: minmax(0,1fr); gap: 6px; }
+      .log-entry { grid-template-columns: 42px minmax(0,1fr); }
+      .log-entry .log-kind { display: none; }
+    }
     @media (max-width: 1220px) {
       .archive-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
     }
@@ -617,6 +661,11 @@
       <button class="icon-btn" data-action="help" title="经营手册" aria-label="经营手册" id="help-btn"></button>
       <button class="icon-btn" data-action="save" title="立即保存" aria-label="立即保存" id="save-btn"></button>
       <button class="icon-btn" data-action="reset" title="重新开局" aria-label="重新开局" id="reset-btn"></button>
+      <div class="notify-wrap" id="notify-wrap">
+        <button class="icon-btn" data-action="toggle-notifications" title="通知中心" aria-label="通知中心" id="notify-btn"></button>
+        <span class="notify-badge" id="notify-badge" hidden></span>
+        <div class="notify-panel" id="notify-panel" hidden></div>
+      </div>
     </div>
   </header>
 
@@ -636,7 +685,7 @@
     "use strict";
 
     const SAVE_KEY = "steel-dynasty-save-v1";
-    const VERSION = 6;
+    const VERSION = 7;
 
     const ICONS = {
       factory: '<path d="M3 21V9l6 3V8l6 4V4h4v17H3Z"/><path d="M7 17h2m3 0h2m3 0h2M17 4V1"/>',
@@ -687,7 +736,9 @@
       superconductor: '<path d="M3 12c3-8 6 8 9 0s6 8 9 0"/><path d="M3 17c3-6 6 6 9 0s6 6 9 0"/>',
       route: '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z"/>',
       users: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.5a3 3 0 0 1 0 7M17 14c2.3.5 4 2.9 4 6"/>',
-      archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v12h14V8M9 12h6M9 16h6"/>'
+      archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v12h14V8M9 12h6M9 16h6"/>',
+      bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
+      log: '<path d="M5 3h11l3 3v15H5V3Z"/><path d="M8 9h8M8 13h8M8 17h5"/>'
     };
 
     function icon(name, cls = "") {
@@ -826,7 +877,7 @@
       ["contracts", "合约", "contract"], ["regions", "布局", "globe"],
       ["projects", "工程", "project"], ["research", "科技", "tech"],
       ["milestones", "里程碑", "quests"], ["archive", "档案", "archive"],
-      ["headquarters", "总部", "hq"], ["team", "团队", "users"]
+      ["headquarters", "总部", "hq"], ["team", "团队", "users"], ["logs", "日志", "log"]
     ];
 
     const POLICIES = {
@@ -1045,6 +1096,19 @@
       { id: "index250k", cat: "巅峰", icon: "archive", name: "工业巨头", desc: "工业指数达到 250,000", target: 250000, value: () => industrialIndex(), reward: { cash: 1500000, blueprints: 10 } }
     ];
 
+    const LOG_KINDS = {
+      production: { name: "生产", icon: "factory" },
+      research: { name: "科技", icon: "research" },
+      project: { name: "工程", icon: "project" },
+      trade: { name: "商业", icon: "contract" },
+      region: { name: "布局", icon: "globe" },
+      staff: { name: "团队", icon: "users" },
+      achievement: { name: "成就", icon: "archive" },
+      management: { name: "管理", icon: "policy" },
+      prestige: { name: "传承", icon: "reset" },
+      system: { name: "系统", icon: "info" }
+    };
+
     const CONTRACT_CLIENTS = ["远洋重工", "天穹航空", "北岸轨交", "极地能源", "量子云城", "东风机械", "深蓝船厂", "星环建设", "北辰市政", "赤道矿业"];
     const CONTRACT_POOL = [
       { res: "steel", min: 80, max: 360, value: 5 },
@@ -1083,7 +1147,7 @@
           synthesized: 0, contractsDone: 0, eventsResolved: 0, prestiges: 0, playtime: 0
         },
         tab: "overview", buyMode: "1", tutorial: true, lastSave: Date.now(),
-        log: [{ time: Date.now(), text: "北辰工业园已接入管理系统。第一批废钢正在入场。" }]
+        log: [{ id: "init-" + Date.now().toString(36), time: Date.now(), text: "北辰工业园已接入管理系统。第一批废钢正在入场。", kind: "system", important: true, read: false }]
       };
     }
 
@@ -1110,12 +1174,21 @@
         merged.staff.hired = [...new Set(Array.isArray(merged.staff.hired) ? merged.staff.hired.filter(id => STAFF[id]) : [])];
         merged.staff.active = [...new Set(Array.isArray(merged.staff.active) ? merged.staff.active.filter(id => STAFF[id] && merged.staff.hired.includes(id)) : [])].slice(0, 3);
         merged.claimedAchievements = [...new Set(Array.isArray(saved.claimedAchievements) ? saved.claimedAchievements.filter(id => ACHIEVEMENTS.some(a => a.id === id)) : [])];
+        if (Array.isArray(saved.log)) {
+          merged.log = saved.log.filter(l => l && l.text).slice(0, 200).map((l, i) => ({
+            id: typeof l.id === "string" ? l.id : "legacy-" + (Number(l.time) || i) + "-" + i,
+            time: Number(l.time) || Date.now(),
+            text: String(l.text),
+            kind: LOG_KINDS[l.kind] ? l.kind : "system",
+            important: !!l.important,
+            read: l.important ? l.read !== false : true
+          }));
+        }
         if (!RECIPES[merged.auto.craft]) merged.auto.craft = "";
         merged.tech = saved.tech || {};
         merged.queue = Array.isArray(saved.queue) ? saved.queue.filter(q => RECIPES[q.id]) : [];
         merged.claimed = Array.isArray(saved.claimed) ? saved.claimed : [];
         merged.contracts = Array.isArray(saved.contracts) ? saved.contracts.slice(0, 3) : [];
-        merged.log = Array.isArray(saved.log) ? saved.log.slice(0, 30) : fresh.log;
         const POLICIES = ["balanced","shifts","maintenance","rnd","market"];
         if (!POLICIES.includes(merged.policy)) merged.policy = "balanced";
         ["cash","steel","aluminum","silicon","circuits","batteries","research","gears","motors","frames","controls","chips","robots","quantum","rareEarth","superconductor","blueprints"].forEach(k => {
@@ -1137,6 +1210,8 @@
     let pointerHeld = false;
     let pointerDownAt = 0;
     let interactionUntil = 0;
+    let notificationOpen = false;
+    let logFilter = "all";
 
     function totalBuildings(s = state) { return Object.values(s.buildings).reduce((a,b) => a + Number(b || 0), 0); }
     function hasTech(id) { return !!state.tech[id]; }
@@ -1254,9 +1329,39 @@
       const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
       return h ? h + "小时 " + m + "分" : m ? m + "分 " + s + "秒" : s + "秒";
     }
-    function addLog(text) {
-      state.log.unshift({ time: Date.now(), text });
-      state.log = state.log.slice(0, 30);
+    function inferLogMeta(text) {
+      const rules = [
+        [/工业档案/, "achievement", true],
+        [/里程碑/, "achievement", true],
+        [/核心团队/, "staff", true],
+        [/全球布局/, "region", true],
+        [/产业纲领/, "management", true],
+        [/超级工程/, "project", true],
+        [/技术突破/, "research", true],
+        [/奠基/, "system", true],
+        [/技术|长期研究/, "research", false],
+        [/合约|现货订单|采购需求/, "trade", false],
+        [/管理方针|调度|永久升级|托管/, "management", false],
+        [/建成|打造|合成|取消|材料已退回/, "production", false]
+      ];
+      for (const [re, kind, important] of rules) if (re.test(text)) return { kind, important };
+      return { kind: "system", important: false };
+    }
+    function addLog(text, kind, important) {
+      const meta = inferLogMeta(text);
+      const finalKind = kind || meta.kind;
+      const finalImportant = important === undefined ? meta.important : !!important;
+      const entry = {
+        id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7),
+        time: Date.now(),
+        text,
+        kind: LOG_KINDS[finalKind] ? finalKind : "system",
+        important: finalImportant,
+        read: !finalImportant
+      };
+      state.log.unshift(entry);
+      state.log = state.log.slice(0, 200);
+      return entry;
     }
     function toast(text, success = false) {
       const stack = document.getElementById("toasts");
@@ -1604,6 +1709,7 @@
         projects: { completed: [...state.projects.completed], active: state.projects.active ? { ...state.projects.active } : null },
         staff: { hired: [...state.staff.hired], active: [...state.staff.active] },
         claimedAchievements: [...state.claimedAchievements],
+        log: state.log.slice(0, 199).map(entry => ({ ...entry })),
         prestiges: state.stats.prestiges + 1,
         playtime: state.stats.playtime
       };
@@ -1617,7 +1723,14 @@
       state.stats.prestiges = carried.prestiges;
       state.stats.playtime = carried.playtime;
       state.cash += state.legacy.startup * 2000;
-      state.log = [{ time: Date.now(), text: "产业完成第 " + carried.prestiges + " 次重组。旧产线已封存，工业蓝图、超级工程与工艺迭代继续生效。" }];
+      state.log = [{
+        id: Date.now().toString(36) + "-prestige",
+        time: Date.now(),
+        text: "产业完成第 " + carried.prestiges + " 次重组。旧产线已封存，工业蓝图、超级工程与工艺迭代继续生效。",
+        kind: "prestige",
+        important: true,
+        read: false
+      }, ...carried.log].slice(0, 200);
       ensureContracts(true);
       saveGame(); render();
       toast("产业重组完成，获得 " + gain + " 枚工业蓝图", true);
@@ -1789,6 +1902,37 @@
       if (count >= 30) bonuses.push("全厂产出再 +15%");
       return { count, current, next, bonusText: bonuses.length ? bonuses.join(" · ") : "尚无档案增益" };
     }
+    function renderLogs() {
+      const counts = {};
+      state.log.forEach(entry => { counts[entry.kind] = (counts[entry.kind] || 0) + 1; });
+      const filterKinds = ["all", ...Object.keys(LOG_KINDS).filter(kind => counts[kind])];
+      if (!filterKinds.includes(logFilter)) logFilter = "all";
+      const filtered = logFilter === "all" ? state.log : state.log.filter(entry => entry.kind === logFilter);
+      const todayKey = logDayKey(Date.now());
+      const todayCount = state.log.filter(entry => logDayKey(entry.time) === todayKey).length;
+      const unread = unreadNoticeCount();
+      let lastDay = null;
+      const list = filtered.map(entry => {
+        const d = new Date(entry.time);
+        const day = logDayKey(entry.time);
+        let dateHead = "";
+        if (day !== lastDay) {
+          dateHead = '<div class="log-date">' + (day === todayKey ? "今天 · " : "") + day + '</div>';
+          lastDay = day;
+        }
+        const meta = LOG_KINDS[entry.kind] || LOG_KINDS.system;
+        return dateHead + '<div class="log-entry"><span class="log-entry-time mono">' + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0") + '</span><span class="log-kind">' + icon(meta.icon) + meta.name + '</span><span class="log-entry-text">' + entry.text + '</span></div>';
+      }).join("");
+      return pageHead("OPERATIONS LOG", "运营日志", "完整记录园区建设、科研、工程、商业、团队与调度决策。重要事件会同步进入右上角通知中心。", '<button class="btn small ghost" data-action="export-logs">' + icon("save") + '导出日志</button><button class="btn small ghost" data-action="clear-logs">' + icon("reset") + '清空</button>') +
+        '<div class="log-summary"><div class="log-summary-card"><strong class="mono">' + state.log.length + '</strong><span>日志总条数</span></div><div class="log-summary-card"><strong class="mono">' + todayCount + '</strong><span>今日新增</span></div><div class="log-summary-card"><strong class="mono ' + (unread ? "accent" : "green") + '">' + unread + '</strong><span>未读通知</span></div></div>' +
+        '<div class="log-filters">' + filterKinds.map(kind => {
+          const meta = kind === "all" ? { name: "全部", icon: "log" } : LOG_KINDS[kind];
+          const count = kind === "all" ? state.log.length : counts[kind];
+          return '<button class="log-filter ' + (logFilter === kind ? "active" : "") + '" data-action="log-filter" data-id="' + kind + '">' + icon(meta.icon) + meta.name + ' ' + count + '</button>';
+        }).join("") + '</div>' +
+        '<section class="panel"><div class="panel-body">' + (filtered.length ? list : '<div class="log-empty">该分类暂无日志</div>') + '</div></section>';
+    }
+
     function renderArchive() {
       const info = archiveTierInfo();
       const progress = info.next ? Math.min(100, info.count / info.next.at * 100) : 100;
@@ -1991,6 +2135,83 @@
       morphChildren(container, template.content);
     }
 
+    function notificationEntries() { return state.log.filter(entry => entry.important); }
+    function unreadNoticeCount() { return notificationEntries().filter(entry => !entry.read).length; }
+    function relativeTime(ts) {
+      const seconds = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+      if (seconds < 60) return "刚刚";
+      if (seconds < 3600) return Math.floor(seconds / 60) + " 分钟前";
+      if (seconds < 86400) return Math.floor(seconds / 3600) + " 小时前";
+      if (seconds < 604800) return Math.floor(seconds / 86400) + " 天前";
+      return new Date(ts).toLocaleDateString("zh-CN");
+    }
+    function renderNotificationUI() {
+      const badge = document.getElementById("notify-badge");
+      const panel = document.getElementById("notify-panel");
+      if (!badge || !panel) return;
+      const unread = unreadNoticeCount();
+      badge.hidden = unread === 0;
+      badge.textContent = unread > 99 ? "99+" : String(unread);
+      document.getElementById("notify-btn").title = unread ? "通知中心 · " + unread + " 条未读" : "通知中心";
+      if (!notificationOpen) {
+        panel.hidden = true;
+        panel.innerHTML = "";
+        return;
+      }
+      const items = notificationEntries().slice(0, 7);
+      panel.hidden = false;
+      panel.innerHTML = '<div class="notify-head"><div><span class="notify-title">通知中心</span><span class="notify-count">' + (unread ? unread + " 条未读" : "全部已读") + '</span></div><button class="btn small ghost" data-action="mark-all-read" ' + (unread ? "" : "disabled") + '>全部已读</button></div><div class="notify-list">' +
+        (items.length ? items.map(entry => '<div class="notice-item ' + (entry.read ? "" : "unread") + '" data-action="read-notice" data-id="' + entry.id + '"><div class="notice-icon">' + icon((LOG_KINDS[entry.kind] || LOG_KINDS.system).icon) + '</div><div class="notice-main"><div class="notice-text">' + entry.text + '</div><div class="notice-time">' + (LOG_KINDS[entry.kind] || LOG_KINDS.system).name + ' · ' + relativeTime(entry.time) + '</div></div><span class="notice-dot ' + (entry.read ? "hidden" : "") + '"></span></div>').join("") : '<div class="log-empty">暂无重要通知</div>') +
+        '</div><div class="notify-foot"><button class="btn small ghost" data-action="nav" data-id="logs">查看全部日志</button></div>';
+    }
+    function toggleNotifications() {
+      notificationOpen = !notificationOpen;
+      renderNotificationUI();
+    }
+    function closeNotifications() {
+      notificationOpen = false;
+      renderNotificationUI();
+    }
+    function markAllNotificationsRead() {
+      let changed = false;
+      notificationEntries().forEach(entry => { if (!entry.read) { entry.read = true; changed = true; } });
+      if (changed) saveGame();
+      render();
+    }
+    function markNoticeRead(id) {
+      const entry = state.log.find(item => item.id === id);
+      if (!entry || entry.read) return;
+      entry.read = true;
+      saveGame(); render();
+    }
+    function logDayKey(time) {
+      const d = new Date(time);
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+    function exportLogs() {
+      if (!state.log.length) { toast("当前没有可导出的日志"); return; }
+      const lines = state.log.slice().reverse().map(entry => {
+        const d = new Date(entry.time);
+        const time = logDayKey(entry.time) + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0");
+        return "[" + time + "] [" + (LOG_KINDS[entry.kind] || LOG_KINDS.system).name + "] " + entry.text;
+      });
+      const blob = new Blob(["钢铁纪元 · 工业日志\n导出时间：" + new Date().toLocaleString("zh-CN") + "\n\n" + lines.join("\n")], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const now = new Date();
+      a.href = url;
+      a.download = "steel-dynasty-log-" + logDayKey(now.getTime()).replace(/-/g, "") + "-" + String(now.getHours()).padStart(2, "0") + String(now.getMinutes()).padStart(2, "0") + ".txt";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast("日志已导出", true);
+    }
+    function confirmClearLogs() {
+      state.log = [];
+      notificationOpen = false;
+      saveGame(); closeModal(); render();
+      toast("日志与通知已清空", true);
+    }
+
     function render() {
       const r = getRates(), rank = rankInfo();
       const powerPct = Math.round(r.efficiency * 100);
@@ -2005,8 +2226,9 @@
       document.getElementById("site-card").innerHTML = '<div class="site-eyebrow">SITE 001 / ONLINE</div><div class="site-name">北辰工业园</div><div class="site-level"><span>' + rank.name + '</span><span class="mono">LV.' + rank.level + '</span></div><div class="xp-track"><div class="xp-fill" style="width:' + xp + '%"></div></div>';
       const claimable = QUESTS.filter(q => !state.claimed.includes(q.id) && q.value(state) >= q.target).length;
       document.getElementById("nav").innerHTML = NAV.map(([id,name,ic]) => '<button class="nav-btn ' + (state.tab===id?"active":"") + '" data-action="nav" data-id="' + id + '">' + icon(ic) + name + (id==="milestones" && claimable ? '<span class="nav-badge">' + claimable + '</span>' : "") + '</button>').join("");
-      const views = { overview: renderOverview, buildings: renderBuildings, crafting: renderCrafting, synthesis: renderSynthesis, contracts: renderContracts, regions: renderRegions, projects: renderProjects, research: renderResearch, milestones: renderMilestones, archive: renderArchive, headquarters: renderHeadquarters, team: renderTeam };
+      const views = { overview: renderOverview, buildings: renderBuildings, crafting: renderCrafting, synthesis: renderSynthesis, contracts: renderContracts, regions: renderRegions, projects: renderProjects, research: renderResearch, milestones: renderMilestones, archive: renderArchive, headquarters: renderHeadquarters, team: renderTeam, logs: renderLogs };
       patchContent(document.getElementById("content"), (views[state.tab] || renderOverview)(), state.tab);
+      renderNotificationUI();
       lastRender = Date.now();
     }
 
@@ -2027,15 +2249,24 @@
     document.addEventListener("pointerup", releasePointer, true);
     document.addEventListener("pointercancel", releasePointer, true);
     window.addEventListener("blur", releasePointer);
-    document.addEventListener("keydown", () => { interactionUntil = Date.now() + 350; }, true);
+    document.addEventListener("keydown", e => {
+      interactionUntil = Date.now() + 350;
+      if (e.key === "Escape" && notificationOpen) closeNotifications();
+    }, true);
 
     document.addEventListener("click", e => {
+      if (notificationOpen && !e.target.closest("#notify-wrap")) closeNotifications();
       const el = e.target.closest("[data-action]");
       if (!el) return;
       const action = el.dataset.action, id = el.dataset.id;
       if (action === "close-modal" && e.target.closest(".modal") && !e.target.closest("button")) return;
       const actions = {
-        nav: () => { state.tab = id; render(); window.scrollTo({ top: 0, behavior: "smooth" }); },
+        nav: () => { closeNotifications(); state.tab = id; render(); window.scrollTo({ top: 0, behavior: "smooth" }); },
+        "toggle-notifications": toggleNotifications, "mark-all-read": markAllNotificationsRead,
+        "read-notice": () => markNoticeRead(id), "export-logs": exportLogs,
+        "log-filter": () => { logFilter = id; render(); },
+        "clear-logs": () => openModal("清空运营日志", "这会删除全部日志和通知记录，<strong>无法撤销</strong>。工业档案、成就与游戏进度不会受影响。", '<button class="btn" data-action="close-modal">保留日志</button><button class="btn primary" data-action="confirm-clear-logs">确认清空</button>'),
+        "confirm-clear-logs": confirmClearLogs,
         "buy-mode": () => { state.buyMode = id; render(); },
         buy: () => buyBuilding(id), craft: () => queueCraft(id), "cancel-craft": () => cancelCraft(id),
         synth: () => synthesize(id), research: () => researchTech(id), claim: () => claimQuest(id),
@@ -2065,6 +2296,7 @@
     document.getElementById("help-btn").innerHTML = icon("help");
     document.getElementById("save-btn").innerHTML = icon("save");
     document.getElementById("reset-btn").innerHTML = icon("reset");
+    document.getElementById("notify-btn").innerHTML = icon("bell");
 
     function applyOffline() {
       const elapsed = Math.max(0,(Date.now() - Number(state.lastSave || Date.now()))/1000);
