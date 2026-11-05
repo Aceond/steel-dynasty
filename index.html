@@ -473,7 +473,41 @@
     .staff-req { color: var(--muted); font-size: 9px; margin-bottom: 8px; }
     .staff-foot { display: flex; gap: 7px; align-items: center; }
     .staff-foot .btn { flex: 1; }
+    .archive-hero { padding: 20px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; background: radial-gradient(circle at 82% 30%, rgba(169,149,213,.11), transparent 36%), var(--panel); }
+    .archive-badge { width: 54px; height: 54px; border: 1px solid rgba(169,149,213,.25); border-radius: 12px; background: rgba(169,149,213,.1); color: var(--purple); display: grid; place-items: center; }
+    .archive-badge .icon { width: 28px; height: 28px; }
+    .archive-info { flex: 1; }
+    .archive-title { font-size: 16px; font-weight: 800; }
+    .archive-sub { color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .archive-progress { margin-top: 10px; }
+    .archive-count { text-align: right; white-space: nowrap; }
+    .archive-count strong { display: block; font-size: 25px; }
+    .archive-count span { color: var(--muted); font-size: 9px; }
+    .archive-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+    .achievement-card { padding: 13px; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,.012); }
+    .achievement-card.done { border-color: rgba(240,161,58,.22); }
+    .achievement-card.claimed { opacity: .82; border-color: rgba(85,199,160,.22); background: var(--green-soft); }
+    .achievement-head { display: flex; align-items: center; gap: 8px; }
+    .achievement-icon { width: 29px; height: 29px; border-radius: 7px; display: grid; place-items: center; color: var(--accent); background: var(--accent-soft); }
+    .achievement-icon .icon { width: 15px; height: 15px; }
+    .achievement-cat { color: var(--faint); font-size: 8px; letter-spacing: 1px; }
+    .achievement-name { font-size: 11px; font-weight: 750; margin-top: 2px; }
+    .achievement-desc { color: var(--muted); font-size: 9px; min-height: 25px; margin: 8px 0; line-height: 1.5; }
+    .achievement-meta { display: flex; justify-content: space-between; gap: 6px; color: var(--faint); font-size: 8px; margin-bottom: 5px; }
+    .achievement-progress { height: 3px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+    .achievement-progress span { display: block; height: 100%; background: var(--purple); }
+    .achievement-reward { display: flex; flex-wrap: wrap; gap: 4px; min-height: 15px; margin-bottom: 8px; }
+    .achievement-reward span { font-size: 8px; color: var(--green); background: var(--green-soft); border-radius: 3px; padding: 2px 5px; }
+    .achievement-card .btn { width: 100%; }
 
+    @media (max-width: 1220px) {
+      .archive-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 680px) {
+      .archive-hero { align-items: flex-start; }
+      .archive-count strong { font-size: 20px; }
+      .archive-grid { grid-template-columns: minmax(0,1fr); }
+    }
     @media (max-width: 980px) {
       .team-grid { grid-template-columns: minmax(0,1fr); }
     }
@@ -601,7 +635,7 @@
     "use strict";
 
     const SAVE_KEY = "steel-dynasty-save-v1";
-    const VERSION = 5;
+    const VERSION = 6;
 
     const ICONS = {
       factory: '<path d="M3 21V9l6 3V8l6 4V4h4v17H3Z"/><path d="M7 17h2m3 0h2m3 0h2M17 4V1"/>',
@@ -651,7 +685,8 @@
       rareEarth: '<path d="m12 2 7 4v8l-7 4-7-4V6l7-4Z"/><path d="m5 6 7 4 7-4M12 10v12m-4-3 4-3 4 3"/>',
       superconductor: '<path d="M3 12c3-8 6 8 9 0s6 8 9 0"/><path d="M3 17c3-6 6 6 9 0s6 6 9 0"/>',
       route: '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z"/>',
-      users: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.5a3 3 0 0 1 0 7M17 14c2.3.5 4 2.9 4 6"/>'
+      users: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.5a3 3 0 0 1 0 7M17 14c2.3.5 4 2.9 4 6"/>',
+      archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v12h14V8M9 12h6M9 16h6"/>'
     };
 
     function icon(name, cls = "") {
@@ -779,6 +814,8 @@
       { id: "rareEarth10000", name: "深海矿主", desc: "累计开采 10,000 吨稀土精矿", target: 10000, value: s => s.stats.rareEarthLifetime, reward: { cash: 600000, research: 20000 } },
       { id: "moduleTotal20", name: "核心矩阵", desc: "所有合成核心总等级达到 20", target: 20, value: s => Object.values(s.modules).reduce((a,b)=>a+b,0), reward: { research: 15000, quantum: 10 } },
       { id: "projects5", name: "文明级工业", desc: "完成全部 5 个超级工程", target: 5, value: s => s.projects.completed.length, reward: { cash: 1000000 } },
+      { id: "archive10", name: "档案馆常客", desc: "归档 10 项工业成就", target: 10, value: s => s.claimedAchievements.length, reward: { research: 12000 } },
+      { id: "archive30", name: "完整工业史", desc: "归档全部 30 项工业成就", target: 30, value: s => s.claimedAchievements.length, reward: { cash: 2000000, blueprints: 20 } },
       { id: "prestige1", name: "第二曲线", desc: "完成 1 次产业重组", target: 1, value: s => s.stats.prestiges, reward: { cash: 50000 } }
     ];
 
@@ -787,8 +824,8 @@
       ["crafting", "打造", "craft"], ["synthesis", "合成", "synth"],
       ["contracts", "合约", "contract"], ["regions", "布局", "globe"],
       ["projects", "工程", "project"], ["research", "科技", "tech"],
-      ["milestones", "里程碑", "quests"], ["headquarters", "总部", "hq"],
-      ["team", "团队", "users"]
+      ["milestones", "里程碑", "quests"], ["archive", "档案", "archive"],
+      ["headquarters", "总部", "hq"], ["team", "团队", "users"]
     ];
 
     const POLICIES = {
@@ -974,6 +1011,39 @@
       hoshino: { name: "星野", title: "轨道建筑师", initials: "星", color: "#d1a7ff", quote: "从轨道往下看，国界线是看不见的。", effects: { all: .2 }, effectText: ["全厂产出 +20%"], cost: { cash: 1200000, superconductor: 100, quantum: 20 }, req: { project: "lunar" } }
     };
 
+    const ACHIEVEMENTS = [
+      { id: "build10", cat: "建设", icon: "factory", name: "初具规模", desc: "拥有 10 座建筑", target: 10, value: s => totalBuildings(s), reward: { cash: 8000 } },
+      { id: "build25", cat: "建设", icon: "factory", name: "工业园区", desc: "拥有 25 座建筑", target: 25, value: s => totalBuildings(s), reward: { cash: 25000 } },
+      { id: "build50", cat: "建设", icon: "hq", name: "工业之城", desc: "拥有 50 座建筑", target: 50, value: s => totalBuildings(s), reward: { cash: 90000, research: 3000 } },
+      { id: "steel1000", cat: "冶金", icon: "steel", name: "千吨钢魂", desc: "累计生产 1,000 吨钢", target: 1000, value: s => s.stats.steelLifetime, reward: { research: 600 } },
+      { id: "steel100000", cat: "冶金", icon: "steel", name: "钢铁洪流", desc: "累计生产 100,000 吨钢", target: 100000, value: s => s.stats.steelLifetime, reward: { cash: 150000 } },
+      { id: "circuits1000", cat: "电子", icon: "circuits", name: "电子血脉", desc: "累计生产 1,000 片电路板", target: 1000, value: s => s.stats.circuitsLifetime, reward: { research: 1800 } },
+      { id: "chips500", cat: "电子", icon: "chip", name: "中国芯", desc: "累计生产 500 枚芯片", target: 500, value: s => s.stats.chipsLifetime, reward: { research: 4500, quantum: 3 } },
+      { id: "rare1000", cat: "边疆", icon: "rareEarth", name: "向深海要资源", desc: "累计开采 1,000 吨稀土", target: 1000, value: s => s.stats.rareEarthLifetime, reward: { cash: 60000 } },
+      { id: "rare10000", cat: "边疆", icon: "rareEarth", name: "深海矿主", desc: "累计开采 10,000 吨稀土", target: 10000, value: s => s.stats.rareEarthLifetime, reward: { cash: 600000 } },
+      { id: "super500", cat: "边疆", icon: "superconductor", name: "超导纪元", desc: "累计生产 500 km 超导带材", target: 500, value: s => s.stats.superconductorLifetime, reward: { cash: 250000, research: 12000 } },
+      { id: "tech5", cat: "科技", icon: "tech", name: "技术立厂", desc: "研究 5 项科技", target: 5, value: s => Object.keys(s.tech).length, reward: { research: 1500 } },
+      { id: "tech12", cat: "科技", icon: "tech", name: "研发密集", desc: "研究 12 项科技", target: 12, value: s => Object.keys(s.tech).length, reward: { research: 7000 } },
+      { id: "tech20", cat: "科技", icon: "quantum", name: "技术奇点", desc: "完成全部 20 项科技", target: 20, value: s => Object.keys(s.tech).length, reward: { research: 25000, quantum: 8 } },
+      { id: "modules8", cat: "合成", icon: "synth", name: "核心矩阵", desc: "所有核心总等级达到 8", target: 8, value: s => Object.values(s.modules).reduce((a,b)=>a+b,0), reward: { research: 3500 } },
+      { id: "modules20", cat: "合成", icon: "quantum", name: "核心过载", desc: "所有核心总等级达到 20", target: 20, value: s => Object.values(s.modules).reduce((a,b)=>a+b,0), reward: { research: 14000 } },
+      { id: "prestige1", cat: "传承", icon: "reset", name: "第二曲线", desc: "完成 1 次产业重组", target: 1, value: s => s.stats.prestiges, reward: { cash: 50000 } },
+      { id: "prestige3", cat: "传承", icon: "blueprint", name: "轮回工业", desc: "完成 3 次产业重组", target: 3, value: s => s.stats.prestiges, reward: { cash: 250000 } },
+      { id: "regions3", cat: "全球", icon: "globe", name: "全球节点", desc: "布局 3 个产业区域", target: 3, value: s => Object.keys(s.regions).filter(id => s.regions[id]).length, reward: { research: 6000 } },
+      { id: "regions6", cat: "全球", icon: "globe", name: "无国界制造", desc: "布局全部 6 个区域", target: 6, value: s => Object.keys(s.regions).filter(id => s.regions[id]).length, reward: { cash: 350000 } },
+      { id: "contracts10", cat: "商业", icon: "contract", name: "可靠供应商", desc: "交付 10 份贸易合约", target: 10, value: s => s.stats.contractsDone, reward: { cash: 35000 } },
+      { id: "contracts40", cat: "商业", icon: "cash", name: "商业帝国", desc: "交付 40 份贸易合约", target: 40, value: s => s.stats.contractsDone, reward: { cash: 250000, research: 8000 } },
+      { id: "events5", cat: "管理", icon: "spark", name: "临场调度", desc: "处理 5 次园区事件", target: 5, value: s => s.stats.eventsResolved, reward: { research: 3000 } },
+      { id: "events20", cat: "管理", icon: "policy", name: "危机管理者", desc: "处理 20 次园区事件", target: 20, value: s => s.stats.eventsResolved, reward: { cash: 150000 } },
+      { id: "staff3", cat: "团队", icon: "users", name: "核心班组", desc: "三个核心席位全部就位", target: 3, value: s => s.staff.active.length, reward: { cash: 60000 } },
+      { id: "staff8", cat: "团队", icon: "users", name: "工业天团", desc: "招募全部 8 名专家", target: 8, value: s => s.staff.hired.length, reward: { cash: 600000 } },
+      { id: "project1", cat: "工程", icon: "project", name: "超级工程", desc: "完成 1 个超级工程", target: 1, value: s => s.projects.completed.length, reward: { research: 6000 } },
+      { id: "projects5", cat: "工程", icon: "globe", name: "文明级工业", desc: "完成全部 5 个超级工程", target: 5, value: s => s.projects.completed.length, reward: { cash: 1200000 } },
+      { id: "iteration30", cat: "长期", icon: "trend", name: "持续改进", desc: "工艺迭代总等级达到 30", target: 30, value: s => Object.values(s.iterations).reduce((a,b)=>a+b,0), reward: { research: 18000 } },
+      { id: "route1", cat: "路线", icon: "route", name: "路线之争", desc: "确立 1 条产业纲领", target: 1, value: s => s.route ? 1 : 0, reward: { cash: 80000, research: 3000 } },
+      { id: "index250k", cat: "巅峰", icon: "archive", name: "工业巨头", desc: "工业指数达到 250,000", target: 250000, value: () => industrialIndex(), reward: { cash: 1500000, blueprints: 10 } }
+    ];
+
     const CONTRACT_CLIENTS = ["远洋重工", "天穹航空", "北岸轨交", "极地能源", "量子云城", "东风机械", "深蓝船厂", "星环建设", "北辰市政", "赤道矿业"];
     const CONTRACT_POOL = [
       { res: "steel", min: 80, max: 360, value: 5 },
@@ -999,7 +1069,7 @@
           deepsea: 0, superconductor: 0, turbine: 0, circularHub: 0, darkCluster: 0
         },
         tech: {}, modules: { automation: 0, grid: 0, nano: 0, material: 0, ai: 0, quantum: 0, geo: 0, will: 0 }, queue: [], claimed: [],
-        route: null, staff: { hired: [], active: [] },
+        route: null, staff: { hired: [], active: [] }, claimedAchievements: [],
         legacy: { startup: 0, heritage: 0, grid: 0, craft: 0, market: 0, knowledge: 0 },
         iterations: { output: 0, power: 0, material: 0, research: 0, craft: 0, trade: 0 },
         projects: { completed: [], active: null },
@@ -1038,6 +1108,7 @@
         merged.staff = { hired: [], active: [], ...(saved.staff || {}) };
         merged.staff.hired = [...new Set(Array.isArray(merged.staff.hired) ? merged.staff.hired.filter(id => STAFF[id]) : [])];
         merged.staff.active = [...new Set(Array.isArray(merged.staff.active) ? merged.staff.active.filter(id => STAFF[id] && merged.staff.hired.includes(id)) : [])].slice(0, 3);
+        merged.claimedAchievements = [...new Set(Array.isArray(saved.claimedAchievements) ? saved.claimedAchievements.filter(id => ACHIEVEMENTS.some(a => a.id === id)) : [])];
         if (!RECIPES[merged.auto.craft]) merged.auto.craft = "";
         merged.tech = saved.tech || {};
         merged.queue = Array.isArray(saved.queue) ? saved.queue.filter(q => RECIPES[q.id]) : [];
@@ -1092,6 +1163,13 @@
     function staffBonus(type) {
       return state.staff.active.reduce((sum, id) => sum + ((STAFF[id]?.effects?.[type]) || 0), 0);
     }
+    function archiveBonus(type) {
+      const count = state.claimedAchievements.length;
+      if (type === "all") return (count >= 5 ? .05 : 0) + (count >= 30 ? .15 : 0);
+      if (type === "power") return count >= 10 ? .1 : 0;
+      if (type === "research") return count >= 20 ? .15 : 0;
+      return 0;
+    }
     function getRates() {
       const policy = POLICIES[state.policy] || POLICIES.balanced;
       let capacity = 0, demand = 0;
@@ -1102,14 +1180,14 @@
         demand += (b.powerUse || 0) * n * deepseaDiscount;
       });
       capacity *= (1 + state.modules.grid * .15) * (hasTech("smartGrid") ? 1.25 : 1) * (hasTech("superconductingGrid") ? 1.5 : 1) * (1 + state.legacy.grid * .1)
-        * (1 + regionBonus("power")) * (1 + projectBonus("power")) * (1 + iterationBonus("power")) * (1 + staffBonus("power")) * buffMult("power");
+        * (1 + regionBonus("power")) * (1 + projectBonus("power")) * (1 + iterationBonus("power")) * (1 + staffBonus("power")) * (1 + archiveBonus("power")) * buffMult("power");
       demand *= policy.power * (hasTech("energyStorage") ? .9 : 1) * (hasTech("circularEconomy") ? .85 : 1) * (1 + routeEffect("powerDemand"));
       const efficiency = demand > 0 ? Math.min(1, capacity / demand) : 1;
       const mult = (1 + state.modules.automation * .2) * (1 + state.modules.quantum * .3) * (1 + state.modules.will * .4)
         * (hasTech("automation") ? 1.5 : 1) * (hasTech("orbital") ? 1.5 : 1)
         * (hasTech("orbitalLogistics") ? 1.5 : 1) * (hasTech("matterPrinting") ? 1.25 : 1)
         * (1 + state.legacy.heritage * .12) * (1 + regionBonus("all")) * (1 + projectBonus("all"))
-        * (1 + iterationBonus("output")) * (1 + routeEffect("output")) * (1 + staffBonus("all")) * buffMult("production") * policy.output;
+        * (1 + iterationBonus("output")) * (1 + routeEffect("output")) * (1 + staffBonus("all")) * (1 + archiveBonus("all")) * buffMult("production") * policy.output;
       const rates = {};
       PRODUCTION_KEYS.forEach(r => { rates[r] = 0; });
       Object.entries(BUILDINGS).forEach(([id,b]) => {
@@ -1127,7 +1205,7 @@
       rates.rareEarth *= frontierMult;
       rates.superconductor *= frontierMult;
       rates.research *= policy.research * (1 + state.legacy.knowledge * .15) * (1 + state.modules.ai * .25) * (hasTech("semiconductors") ? 1.2 : 1) * (hasTech("quantum") ? 1.5 : 1) * (hasTech("agvSwarm") ? 1.4 : 1)
-        * (1 + regionBonus("research")) * (1 + iterationBonus("research")) * (1 + routeEffect("research")) * (1 + staffBonus("research")) * buffMult("research");
+        * (1 + regionBonus("research")) * (1 + iterationBonus("research")) * (1 + routeEffect("research")) * (1 + staffBonus("research")) * (1 + archiveBonus("research")) * buffMult("research");
       rates.cash *= policy.cash * (1 + regionBonus("cash")) * (1 + routeEffect("cash")) * (1 + staffBonus("cash")) * buffMult("cash");
       return { ...rates, capacity, demand, efficiency, mult };
     }
@@ -1370,6 +1448,15 @@
       if (req.project && !projectComplete(req.project)) return false;
       return true;
     }
+    function achievementComplete(item) { return item.value(state) >= item.target; }
+    function claimAchievement(id) {
+      const item = ACHIEVEMENTS.find(a => a.id === id);
+      if (!item || state.claimedAchievements.includes(id) || !achievementComplete(item)) return;
+      state.claimedAchievements.push(id);
+      grant(item.reward);
+      addLog("工业档案解锁：" + item.name + "。");
+      toast("档案成就：" + item.name, true); render();
+    }
     function hireStaff(id) {
       const person = STAFF[id];
       if (!person || state.staff.hired.includes(id) || !staffRequirementMet(id) || !canAfford(person.cost)) return;
@@ -1515,6 +1602,7 @@
         iterations: { ...state.iterations },
         projects: { completed: [...state.projects.completed], active: state.projects.active ? { ...state.projects.active } : null },
         staff: { hired: [...state.staff.hired], active: [...state.staff.active] },
+        claimedAchievements: [...state.claimedAchievements],
         prestiges: state.stats.prestiges + 1,
         playtime: state.stats.playtime
       };
@@ -1524,6 +1612,7 @@
       state.iterations = carried.iterations;
       state.projects = carried.projects;
       state.staff = carried.staff;
+      state.claimedAchievements = carried.claimedAchievements;
       state.stats.prestiges = carried.prestiges;
       state.stats.playtime = carried.playtime;
       state.cash += state.legacy.startup * 2000;
@@ -1543,7 +1632,7 @@
       );
     }
     function industrialIndex() {
-      return score() + state.projects.completed.length * 20000 + Object.values(state.iterations).reduce((a,b) => a+b, 0) * 800;
+      return score() + state.projects.completed.length * 20000 + Object.values(state.iterations).reduce((a,b) => a+b, 0) * 800 + state.claimedAchievements.length * 500;
     }
     function rankInfo() {
       const s = industrialIndex();
@@ -1675,6 +1764,42 @@
           const level = state.modules[id], cost = moduleCost(id);
           return '<section class="panel module-card"><div class="module-visual"><div class="module-level">CORE / LV.' + level + '</div><div class="core"></div></div><div class="module-body"><div class="building-name">' + m.name + '</div><div class="building-desc">' + m.desc + '</div><div class="module-effect">当前：' + moduleEffect(id, level) + '<br>下级：' + moduleEffect(id, level + 1) + '</div><div class="costs">' + costHTML(cost) + '</div><button class="btn primary full" data-action="synth" data-id="' + id + '" ' + (!canAfford(cost) ? "disabled" : "") + '>' + icon("synth") + (level ? "合成并升级" : "启动核心合成") + '</button></div></section>';
         }).join("") + '</div>';
+    }
+
+    function archiveTierInfo() {
+      const count = state.claimedAchievements.length;
+      const tiers = [
+        { at: 0, name: "见习档案员", bonus: "尚无档案增益" },
+        { at: 5, name: "工业记录者", bonus: "全厂产出 +5%" },
+        { at: 10, name: "产业史学家", bonus: "发电能力 +10%" },
+        { at: 20, name: "文明编纂者", bonus: "研究产出 +15%" },
+        { at: 30, name: "工业记忆体", bonus: "全厂产出额外 +15%" }
+      ];
+      let current = tiers[0], next = tiers[1];
+      for (let i = 0; i < tiers.length; i++) {
+        if (count >= tiers[i].at) current = tiers[i];
+        if (tiers[i].at > count) { next = tiers[i]; break; }
+        next = null;
+      }
+      const bonuses = [];
+      if (count >= 5) bonuses.push("全厂产出 +5%");
+      if (count >= 10) bonuses.push("发电能力 +10%");
+      if (count >= 20) bonuses.push("研究产出 +15%");
+      if (count >= 30) bonuses.push("全厂产出再 +15%");
+      return { count, current, next, bonusText: bonuses.length ? bonuses.join(" · ") : "尚无档案增益" };
+    }
+    function renderArchive() {
+      const info = archiveTierInfo();
+      const progress = info.next ? Math.min(100, info.count / info.next.at * 100) : 100;
+      const cards = ACHIEVEMENTS.map(item => {
+        const done = achievementComplete(item), claimed = state.claimedAchievements.includes(item.id);
+        const value = Math.min(item.value(state), item.target);
+        const pct = Math.min(100, item.value(state) / item.target * 100);
+        return '<section class="achievement-card ' + (done ? "done" : "") + ' ' + (claimed ? "claimed" : "") + '"><div class="achievement-head"><div class="achievement-icon">' + icon(item.icon) + '</div><div><div class="achievement-cat">' + item.cat + '</div><div class="achievement-name">' + item.name + '</div></div></div><div class="achievement-desc">' + item.desc + '</div><div class="achievement-meta"><span>' + (claimed ? "已归档" : done ? "可领取" : "进行中") + '</span><span class="mono">' + fmt(value) + ' / ' + fmt(item.target) + '</span></div><div class="achievement-progress"><span style="width:' + pct + '%"></span></div><div class="achievement-reward">' + Object.entries(item.reward).map(([r,v]) => '<span>+' + fmt(v) + ' ' + RES[r].name + '</span>').join("") + '</div><button class="btn small ' + (done && !claimed ? "primary" : "") + '" data-action="claim-achievement" data-id="' + item.id + '" ' + (!done || claimed ? "disabled" : "") + '>' + (claimed ? "已归档" : done ? "领取档案奖励" : "尚未完成") + '</button></section>';
+      }).join("");
+      return pageHead("INDUSTRIAL ARCHIVE", "工业档案馆", "记录每一次技术、工程与商业突破。领取成就会提升档案等级，提供跨产业重组保留的永久增益。", '<div class="panel-tag">' + info.count + ' / ' + ACHIEVEMENTS.length + ' 已归档</div>') +
+        '<section class="panel archive-hero"><div class="archive-badge">' + icon("archive") + '</div><div class="archive-info"><div class="archive-title">' + info.current.name + '</div><div class="archive-sub">累计档案增益：' + info.bonusText + '</div><div class="archive-progress"><div class="progress"><span style="width:' + progress + '%"></span></div></div></div><div class="archive-count"><strong class="mono">' + info.count + '</strong><span>' + (info.next ? "距离「" + info.next.name + "」还差 " + (info.next.at - info.count) + " 项" : "全部档案等级已解锁") + '</span></div></section>' +
+        '<div class="archive-grid">' + cards + '</div>';
     }
 
     function renderTeam() {
@@ -1815,7 +1940,7 @@
       return pageHead("GROUP HEADQUARTERS", "集团总部", "切换管理方针，用工业蓝图购买永久升级。产业重组会重置园区，但经验和蓝图会留下。", '<div class="panel-tag">重组 ' + state.stats.prestiges + ' 次</div>') +
         '<section class="panel hq-summary"><div><div class="blueprint-label">可用工业蓝图</div><div class="blueprint-number mono">' + fmt(state.blueprints) + ' <span style="font-size:11px;color:var(--muted)">BP</span></div><div class="blueprint-label" style="margin-top:7px">来自产业重组，永久保留</div></div><div class="building-icon" style="width:58px;height:58px;border-color:rgba(169,149,213,.3);background:rgba(169,149,213,.12);color:var(--purple)">' + icon("blueprint") + '</div></section>' +
         '<div class="hq-cols"><section class="panel"><div class="panel-head"><div class="panel-title">' + icon("policy") + '管理方针</div><div class="panel-tag">随时切换 · 只生效一项</div></div><div class="panel-body"><div class="policy-grid">' + policyCards + '</div></div></section>' +
-          '<section class="prestige-card"><div class="contract-client">INDUSTRIAL RESTRUCTURING</div><h3>产业重组</h3><p>封存当前园区，保留蓝图、超级工程、工艺迭代、核心团队与永久升级。重组只计算本轮园区指数，不会把永久工程重复变现。</p><div class="prestige-gain"><span>' + (canPrestige ? "本次可获得" : "重组门槛：工业指数 " + fmt(requirement)) + '</span><strong class="mono">' + (canPrestige ? "+" + gain + " BP" : fmt(score()) + " / " + fmt(requirement)) + '</strong></div><button class="btn primary full" data-action="prestige" ' + (!canPrestige ? "disabled" : "") + '>' + icon("reset") + (canPrestige ? "执行产业重组" : "尚未达到重组条件") + '</button></section></div>' +
+          '<section class="prestige-card"><div class="contract-client">INDUSTRIAL RESTRUCTURING</div><h3>产业重组</h3><p>封存当前园区，保留蓝图、超级工程、工艺迭代、核心团队、工业档案与永久升级。重组只计算本轮园区指数，不会把永久工程重复变现。</p><div class="prestige-gain"><span>' + (canPrestige ? "本次可获得" : "重组门槛：工业指数 " + fmt(requirement)) + '</span><strong class="mono">' + (canPrestige ? "+" + gain + " BP" : fmt(score()) + " / " + fmt(requirement)) + '</strong></div><button class="btn primary full" data-action="prestige" ' + (!canPrestige ? "disabled" : "") + '>' + icon("reset") + (canPrestige ? "执行产业重组" : "尚未达到重组条件") + '</button></section></div>' +
         routePanelHTML() + automationPanelHTML() +
         '<section class="panel" style="margin-top:14px"><div class="panel-head"><div class="panel-title">' + icon("blueprint") + '永久升级</div><div class="panel-tag">工业蓝图不会被重组清空</div></div><div class="panel-body"><div class="legacy-grid">' + legacyCards + '</div></div></section>';
     }
@@ -1879,7 +2004,7 @@
       document.getElementById("site-card").innerHTML = '<div class="site-eyebrow">SITE 001 / ONLINE</div><div class="site-name">北辰工业园</div><div class="site-level"><span>' + rank.name + '</span><span class="mono">LV.' + rank.level + '</span></div><div class="xp-track"><div class="xp-fill" style="width:' + xp + '%"></div></div>';
       const claimable = QUESTS.filter(q => !state.claimed.includes(q.id) && q.value(state) >= q.target).length;
       document.getElementById("nav").innerHTML = NAV.map(([id,name,ic]) => '<button class="nav-btn ' + (state.tab===id?"active":"") + '" data-action="nav" data-id="' + id + '">' + icon(ic) + name + (id==="milestones" && claimable ? '<span class="nav-badge">' + claimable + '</span>' : "") + '</button>').join("");
-      const views = { overview: renderOverview, buildings: renderBuildings, crafting: renderCrafting, synthesis: renderSynthesis, contracts: renderContracts, regions: renderRegions, projects: renderProjects, research: renderResearch, milestones: renderMilestones, headquarters: renderHeadquarters, team: renderTeam };
+      const views = { overview: renderOverview, buildings: renderBuildings, crafting: renderCrafting, synthesis: renderSynthesis, contracts: renderContracts, regions: renderRegions, projects: renderProjects, research: renderResearch, milestones: renderMilestones, archive: renderArchive, headquarters: renderHeadquarters, team: renderTeam };
       patchContent(document.getElementById("content"), (views[state.tab] || renderOverview)(), state.tab);
       lastRender = Date.now();
     }
@@ -1889,7 +2014,7 @@
     }
     function closeModal() { document.getElementById("modal-root").innerHTML = ""; }
     function showHelp() {
-      openModal("厂长经营手册", '<strong>目标：</strong>从回收废钢起步，建立涵盖能源、冶金、电子、量子与轨道制造的现代工业体系。<div class="help-steps"><div class="help-step"><span class="step-num">1</span><div><strong>先电力，后产能</strong><br>所有耗电建筑共享电网。供电不足时，全厂效率会按供电比例下降；储能与循环经济科技能压低需求。</div></div><div class="help-step"><span class="step-num">2</span><div><strong>打通多层产业链</strong><br>钢铝 → 电路与硅料 → 电池与部件 → 芯片、机器人、量子单元。高级配方需要先研究对应科技。</div></div><div class="help-step"><span class="step-num">3</span><div><strong>处理调度事件</strong><br>总览页会不定期出现园区事件。短期增益和即时资源都要付代价，没有“全都要”的选项。</div></div><div class="help-step"><span class="step-num">4</span><div><strong>把园区铺向全球</strong><br>「布局」页一次性投资区域基地，永久增强电力、研究、合约或建造成本。区域越多，协同越强。</div></div><div class="help-step"><span class="step-num">5</span><div><strong>托管与产业纲领</strong><br>拥有 12 座建筑后可启用自动补电和自动打造；研究全自动流水线后，还可在总部选择互斥产业纲领，解锁专属建筑。</div></div><div class="help-step"><span class="step-num">6</span><div><strong>把目光放到小时级工程</strong><br>「工程」页的超级工程会持续 45 分钟到 12 小时，离线也计时。完工后永久增强产能并解锁稀土与超导产业链。</div></div><div class="help-step"><span class="step-num">7</span><div><strong>组建核心团队</strong><br>「团队」页招募 8 名工业专家，但只有 3 个核心席位。专家加成覆盖产能、能源、研究、合约与边疆资源，团队跨重组保留。</div></div><div class="help-step"><span class="step-num">8</span><div><strong>迭代、重组与离线</strong><br>科技页底部的工艺迭代是不可重置的长期研究；产业重组会保留工程、迭代与团队，只重置本轮园区。离线按 50% 效率结算，最多 8 小时。</div></div></div>', '<button class="btn primary" data-action="close-modal">开始经营</button>');
+      openModal("厂长经营手册", '<strong>目标：</strong>从回收废钢起步，建立涵盖能源、冶金、电子、量子与轨道制造的现代工业体系。<div class="help-steps"><div class="help-step"><span class="step-num">1</span><div><strong>先电力，后产能</strong><br>所有耗电建筑共享电网。供电不足时，全厂效率会按供电比例下降；储能与循环经济科技能压低需求。</div></div><div class="help-step"><span class="step-num">2</span><div><strong>打通多层产业链</strong><br>钢铝 → 电路与硅料 → 电池与部件 → 芯片、机器人、量子单元。高级配方需要先研究对应科技。</div></div><div class="help-step"><span class="step-num">3</span><div><strong>处理调度事件</strong><br>总览页会不定期出现园区事件。短期增益和即时资源都要付代价，没有“全都要”的选项。</div></div><div class="help-step"><span class="step-num">4</span><div><strong>把园区铺向全球</strong><br>「布局」页一次性投资区域基地，永久增强电力、研究、合约或建造成本。区域越多，协同越强。</div></div><div class="help-step"><span class="step-num">5</span><div><strong>托管与产业纲领</strong><br>拥有 12 座建筑后可启用自动补电和自动打造；研究全自动流水线后，还可在总部选择互斥产业纲领，解锁专属建筑。</div></div><div class="help-step"><span class="step-num">6</span><div><strong>把目光放到小时级工程</strong><br>「工程」页的超级工程会持续 45 分钟到 12 小时，离线也计时。完工后永久增强产能并解锁稀土与超导产业链。</div></div><div class="help-step"><span class="step-num">7</span><div><strong>组建核心团队</strong><br>「团队」页招募 8 名工业专家，但只有 3 个核心席位。专家加成覆盖产能、能源、研究、合约与边疆资源，团队跨重组保留。</div></div><div class="help-step"><span class="step-num">8</span><div><strong>档案、迭代与离线</strong><br>「档案」页的工业成就会提升永久档案等级；科技页底部的工艺迭代也是长期研究。产业重组保留档案、工程、迭代与团队，只重置本轮园区。离线按 50% 效率结算，最多 8 小时。</div></div></div>', '<button class="btn primary" data-action="close-modal">开始经营</button>');
     }
 
     // 交互期间冻结后台重绘：避免按压中的按钮被 innerHTML 替换，导致 click 丢失。
@@ -1919,10 +2044,11 @@
         "start-project": () => startProject(id), "buy-iteration": () => buyIteration(id),
         "route-choose": () => pickRoute(id), "confirm-route": () => commitRoute(id),
         "hire-staff": () => hireStaff(id), "toggle-staff": () => toggleStaff(id),
+        "claim-achievement": () => claimAchievement(id),
         policy: () => setPolicy(id), legacy: () => buyLegacy(id),
         prestige: () => {
           const gain = prestigeGain();
-          openModal("产业重组确认", "本次重组将<strong>清空建筑、资源、科技、打造队列与合成核心</strong>，但保留全部工业蓝图、永久升级、超级工程、工艺迭代与核心团队。产业纲领与本轮科技将重置。预计获得 <strong>" + gain + " BP</strong>。<br><br>本轮工业指数：" + fmt(score()) + "，重组后将从一座光伏电站重新起步。", '<button class="btn" data-action="close-modal">暂不重组</button><button class="btn primary" data-action="confirm-prestige">确认产业重组</button>');
+          openModal("产业重组确认", "本次重组将<strong>清空建筑、资源、科技、打造队列与合成核心</strong>，但保留全部工业蓝图、永久升级、超级工程、工艺迭代、核心团队与工业档案。产业纲领与本轮科技将重置。预计获得 <strong>" + gain + " BP</strong>。<br><br>本轮工业指数：" + fmt(score()) + "，重组后将从一座光伏电站重新起步。", '<button class="btn" data-action="close-modal">暂不重组</button><button class="btn primary" data-action="confirm-prestige">确认产业重组</button>');
         },
         "confirm-prestige": () => { closeModal(); doPrestige(); },
         sell: () => sellSteel(false), "sell-all": () => sellSteel(true), save: () => saveGame(true),
