@@ -81,6 +81,9 @@
     .resource-value { font-weight: 750; font-size: 14px; line-height: 1.25; }
     .resource-meta { font-size: 10px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
     .resource-meta .rate { color: var(--green); margin-left: 5px; }
+    .resource-chip.power .icon { color: var(--accent); }
+    .resource-chip.power.warn { border-color: rgba(228,119,104,.22); background: rgba(228,119,104,.05); }
+    .resource-chip.power.warn .icon, .resource-chip.power.warn .resource-value, .resource-chip.power.warn .rate { color: var(--red); }
     .top-actions { display: flex; gap: 8px; }
     .icon-btn {
       width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 8px;
@@ -539,6 +542,7 @@
       .resource-value { font-size: 12px; }
       .resource-meta { font-size: 8px; }
       .resource-meta .rate { display: inline; }
+      .power-label { display: none; }
       .top-actions { margin-left: auto; }
       .icon-btn { width: 34px; height: 34px; }
       .app-shell { padding: 12px 12px 35px; gap: 13px; }
@@ -1863,11 +1867,13 @@
 
     function render() {
       const r = getRates(), rank = rankInfo();
+      const powerPct = Math.round(r.efficiency * 100);
+      const powerWarn = r.demand > r.capacity;
       document.getElementById("resources").innerHTML = ["cash","steel","circuits","research"].map(res => {
         const value = res === "cash" ? money(state[res]) : fmt(state[res]) + " " + RES[res].unit;
         const rate = r[res] > 0 ? '<span class="rate">+' + fmt(r[res]) + '/s</span>' : "";
         return '<div class="resource-chip">' + icon(RES[res].icon) + '<div><div class="resource-value mono">' + value + '</div><div class="resource-meta">' + RES[res].name + rate + '</div></div></div>';
-      }).join("");
+      }).join("") + '<div class="resource-chip power ' + (powerWarn ? "warn" : "") + '" title="发电能力 ' + fmt(r.capacity) + ' MW / 全厂负载 ' + fmt(r.demand) + ' MW，供电效率 ' + powerPct + '%">' + icon("power") + '<div><div class="resource-value mono">' + powerPct + '%</div><div class="resource-meta"><span class="power-label">电力 </span><span class="rate">' + fmt(r.capacity) + '/' + fmt(r.demand) + ' MW</span></div></div></div>';
       const prev = rank.level === 1 ? 0 : [0,0,700,2200,5500,11000,24000,50000,100000,250000,600000][rank.level];
       const xp = rank.next === prev ? 100 : Math.min(100,(industrialIndex()-prev)/(rank.next-prev)*100);
       document.getElementById("site-card").innerHTML = '<div class="site-eyebrow">SITE 001 / ONLINE</div><div class="site-name">北辰工业园</div><div class="site-level"><span>' + rank.name + '</span><span class="mono">LV.' + rank.level + '</span></div><div class="xp-track"><div class="xp-fill" style="width:' + xp + '%"></div></div>';
