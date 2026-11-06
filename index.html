@@ -474,6 +474,38 @@
     .staff-req { color: var(--muted); font-size: 9px; margin-bottom: 8px; }
     .staff-foot { display: flex; gap: 7px; align-items: center; }
     .staff-foot .btn { flex: 1; }
+    .crew-panel { padding: 15px; margin-bottom: 13px; }
+    .crew-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+    .crew-title { font-size: 12px; font-weight: 750; display: flex; align-items: center; gap: 7px; }
+    .crew-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .crew-chip { border: 1px solid var(--line); border-radius: 6px; background: rgba(255,255,255,.02); color: var(--muted); padding: 6px 9px; font-size: 9px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .crew-chip.selected { border-color: rgba(240,161,58,.4); background: var(--accent-soft); color: var(--accent); }
+    .crew-chip.core, .crew-chip.away { opacity: .45; cursor: default; }
+    .crew-chip .star { color: var(--purple); }
+    .expedition-hero { padding: 18px; margin-bottom: 13px; background: radial-gradient(circle at 82% 20%, rgba(85,199,160,.1), transparent 34%), var(--panel); }
+    .expedition-hero-top { display: flex; align-items: center; gap: 14px; }
+    .expedition-hero-icon { width: 48px; height: 48px; border-radius: 10px; display: grid; place-items: center; color: var(--green); background: var(--green-soft); }
+    .expedition-hero-icon .icon { width: 25px; height: 25px; }
+    .expedition-hero-title { font-size: 16px; font-weight: 800; }
+    .expedition-hero-sub { color: var(--muted); font-size: 10px; margin-top: 4px; }
+    .expedition-hero-clock { margin-left: auto; text-align: right; }
+    .expedition-hero-clock strong { display: block; font-size: 18px; }
+    .expedition-hero-clock span { color: var(--faint); font-size: 9px; }
+    .expedition-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px; }
+    .expedition-card { padding: 16px; position: relative; }
+    .expedition-card.locked { opacity: .55; }
+    .expedition-card-top { display: flex; gap: 10px; align-items: flex-start; }
+    .expedition-icon { width: 37px; height: 37px; flex: 0 0 auto; border-radius: 8px; display: grid; place-items: center; color: var(--accent); background: var(--accent-soft); }
+    .expedition-name { font-size: 13px; font-weight: 750; }
+    .expedition-tag { color: var(--faint); font-size: 8px; letter-spacing: 1px; margin-bottom: 3px; }
+    .expedition-desc { color: var(--muted); font-size: 10px; line-height: 1.65; margin: 10px 0; min-height: 33px; }
+    .expedition-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+    .expedition-meta span { font-size: 9px; border-radius: 4px; padding: 3px 6px; background: rgba(255,255,255,.035); color: var(--muted); }
+    .expedition-meta .good { color: var(--green); background: var(--green-soft); }
+    .expedition-rewards { color: var(--faint); font-size: 9px; line-height: 1.6; margin-bottom: 10px; }
+    .expedition-rewards strong { color: var(--green); font-weight: 600; }
+    .expedition-req { color: var(--accent); font-size: 9px; margin-bottom: 8px; }
+
     .archive-hero { padding: 20px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; background: radial-gradient(circle at 82% 30%, rgba(169,149,213,.11), transparent 36%), var(--panel); }
     .archive-badge { width: 54px; height: 54px; border: 1px solid rgba(169,149,213,.25); border-radius: 12px; background: rgba(169,149,213,.1); color: var(--purple); display: grid; place-items: center; }
     .archive-badge .icon { width: 28px; height: 28px; }
@@ -555,6 +587,11 @@
     }
     @media (max-width: 980px) {
       .team-grid { grid-template-columns: minmax(0,1fr); }
+      .expedition-grid { grid-template-columns: minmax(0,1fr); }
+    }
+    @media (max-width: 680px) {
+      .expedition-hero-top { align-items: flex-start; flex-wrap: wrap; }
+      .expedition-hero-clock { margin-left: 0; text-align: left; width: 100%; }
     }
     @media (max-width: 680px) {
       .team-slots { grid-template-columns: minmax(0,1fr); }
@@ -685,7 +722,7 @@
     "use strict";
 
     const SAVE_KEY = "steel-dynasty-save-v1";
-    const VERSION = 7;
+    const VERSION = 8;
 
     const ICONS = {
       factory: '<path d="M3 21V9l6 3V8l6 4V4h4v17H3Z"/><path d="M7 17h2m3 0h2m3 0h2M17 4V1"/>',
@@ -738,7 +775,8 @@
       users: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.5a3 3 0 0 1 0 7M17 14c2.3.5 4 2.9 4 6"/>',
       archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v12h14V8M9 12h6M9 16h6"/>',
       bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
-      log: '<path d="M5 3h11l3 3v15H5V3Z"/><path d="M8 9h8M8 13h8M8 17h5"/>'
+      log: '<path d="M5 3h11l3 3v15H5V3Z"/><path d="M8 9h8M8 13h8M8 17h5"/>',
+      expedition: '<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/>'
     };
 
     function icon(name, cls = "") {
@@ -866,6 +904,8 @@
       { id: "rareEarth10000", name: "深海矿主", desc: "累计开采 10,000 吨稀土精矿", target: 10000, value: s => s.stats.rareEarthLifetime, reward: { cash: 600000, research: 20000 } },
       { id: "moduleTotal20", name: "核心矩阵", desc: "所有合成核心总等级达到 20", target: 20, value: s => Object.values(s.modules).reduce((a,b)=>a+b,0), reward: { research: 15000, quantum: 10 } },
       { id: "projects5", name: "文明级工业", desc: "完成全部 5 个超级工程", target: 5, value: s => s.projects.completed.length, reward: { cash: 1000000 } },
+      { id: "expedition1", name: "第一次远征", desc: "完成 1 次远征探索", target: 1, value: s => s.stats.expeditionRuns, reward: { cash: 30000 } },
+      { id: "expedition10", name: "远征老手", desc: "完成 10 次远征探索", target: 10, value: s => s.stats.expeditionRuns, reward: { research: 10000, blueprints: 3 } },
       { id: "archive10", name: "档案馆常客", desc: "归档 10 项工业成就", target: 10, value: s => s.claimedAchievements.length, reward: { research: 12000 } },
       { id: "archive30", name: "完整工业史", desc: "归档全部 30 项工业成就", target: 30, value: s => s.claimedAchievements.length, reward: { cash: 2000000, blueprints: 20 } },
       { id: "prestige1", name: "第二曲线", desc: "完成 1 次产业重组", target: 1, value: s => s.stats.prestiges, reward: { cash: 50000 } }
@@ -875,7 +915,7 @@
       ["overview", "总览", "overview"], ["buildings", "建筑", "building"],
       ["crafting", "打造", "craft"], ["synthesis", "合成", "synth"],
       ["contracts", "合约", "contract"], ["regions", "布局", "globe"],
-      ["projects", "工程", "project"], ["research", "科技", "tech"],
+      ["projects", "工程", "project"], ["expeditions", "远征", "expedition"], ["research", "科技", "tech"],
       ["milestones", "里程碑", "quests"], ["archive", "档案", "archive"],
       ["headquarters", "总部", "hq"], ["team", "团队", "users"], ["logs", "日志", "log"]
     ];
@@ -907,6 +947,45 @@
     };
 
     const AUTO_TARGETS = { gear: 15, motor: 10, frame: 8, control: 8, robot: 4, quantum: 2 };
+
+    const EXPEDITIONS = {
+      outskirts: {
+        name: "北郊废墟", tag: "近郊勘探", icon: "box", duration: 3 * 60, recommend: "shen",
+        desc: "旧工业区的废弃厂群仍有可用设备与零散原料，适合作为队伍磨合的第一站。",
+        cost: { batteries: 12, gears: 6 },
+        rewards: { cash: [5000, 9000], steel: [80, 160], research: [150, 350] }
+      },
+      coast: {
+        name: "临港外海", tag: "海运回收", icon: "truck", duration: 10 * 60, recommend: "tang", req: { region: "lingang" },
+        desc: "打捞废弃货轮与海底电缆，回收电子部件和可交易金属。",
+        cost: { cash: 25000, batteries: 100, frames: 12 },
+        rewards: { cash: [30000, 60000], circuits: [100, 250], chips: [3, 8], research: [800, 1600] }
+      },
+      deepsea: {
+        name: "深海热液区", tag: "边疆采样", icon: "rareEarth", duration: 30 * 60, recommend: "luo", req: { project: "deepsea" },
+        desc: "在高温高压热液喷口布设采样器，带回高品位稀土与超导前驱体。",
+        cost: { robots: 15, batteries: 250, frames: 60 },
+        rewards: { rareEarth: [400, 900], superconductor: [20, 60], research: [3000, 6000] }
+      },
+      orbit: {
+        name: "近地轨道残骸带", tag: "轨道回收", icon: "quantum", duration: 60 * 60, recommend: "hoshino", req: { project: "spaceElevator" },
+        desc: "回收早期试验卫星与轨道工厂残骸，部分精密组件仍可直接复用。",
+        cost: { chips: 80, quantum: 6, superconductor: 50 },
+        rewards: { superconductor: [120, 260], quantum: [8, 20], blueprints: [2, 4], research: [12000, 22000] }
+      },
+      lunar: {
+        name: "月面静海", tag: "地月远征", icon: "globe", duration: 2 * 3600, recommend: "ye", req: { project: "lunar" },
+        desc: "沿月球工业带外围建立临时前哨，采集氦-3 与高纯度月壤。",
+        cost: { rareEarth: 1800, superconductor: 120, quantum: 18 },
+        rewards: { rareEarth: [2500, 5000], superconductor: [300, 600], blueprints: [5, 9], research: [30000, 50000] }
+      },
+      void: {
+        name: "聚变环外缘", tag: "极限远征", icon: "superconductor", duration: 4 * 3600, recommend: "gu", req: { project: "fusionRing" },
+        desc: "在赤道聚变环的强磁场边缘维护外环结构，顺手取回被抛射的高能材料。",
+        cost: { superconductor: 700, quantum: 40, chips: 250 },
+        rewards: { quantum: [40, 90], blueprints: [14, 24], research: [80000, 140000] }
+      }
+    };
 
     const PROJECT_ORDER = ["hydrogen", "deepsea", "spaceElevator", "lunar", "fusionRing"];
     const PROJECTS = {
@@ -1103,6 +1182,7 @@
       trade: { name: "商业", icon: "contract" },
       region: { name: "布局", icon: "globe" },
       staff: { name: "团队", icon: "users" },
+      expedition: { name: "远征", icon: "expedition" },
       achievement: { name: "成就", icon: "archive" },
       management: { name: "管理", icon: "policy" },
       prestige: { name: "传承", icon: "reset" },
@@ -1137,14 +1217,14 @@
         route: null, staff: { hired: [], active: [] }, claimedAchievements: [],
         legacy: { startup: 0, heritage: 0, grid: 0, craft: 0, market: 0, knowledge: 0 },
         iterations: { output: 0, power: 0, material: 0, research: 0, craft: 0, trade: 0 },
-        projects: { completed: [], active: null },
+        projects: { completed: [], active: null }, expedition: { active: null },
         contracts: [], policy: "balanced", regions: { home: true }, auto: { power: false, craft: "" },
         buffs: {}, currentEvent: null, nextEventAt: 0, lastEvent: "",
         stats: {
           steelLifetime: 0, aluminumLifetime: 0, siliconLifetime: 0, circuitsLifetime: 0, batteriesLifetime: 0, chipsLifetime: 0,
           rareEarthLifetime: 0, superconductorLifetime: 0,
           crafted: 0, framesCrafted: 0, controlsCrafted: 0, robotsCrafted: 0, quantumCrafted: 0,
-          synthesized: 0, contractsDone: 0, eventsResolved: 0, prestiges: 0, playtime: 0
+          synthesized: 0, contractsDone: 0, eventsResolved: 0, expeditionRuns: 0, expeditionSuccess: 0, expeditionPartial: 0, expeditionFail: 0, prestiges: 0, playtime: 0
         },
         tab: "overview", buyMode: "1", tutorial: true, lastSave: Date.now(),
         log: [{ id: "init-" + Date.now().toString(36), time: Date.now(), text: "北辰工业园已接入管理系统。第一批废钢正在入场。", kind: "system", important: true, read: false }]
@@ -1167,6 +1247,19 @@
         merged.projects = { completed: [], active: null, ...(saved.projects || {}) };
         merged.projects.completed = Array.isArray(merged.projects.completed) ? merged.projects.completed.filter(id => PROJECTS[id]) : [];
         if (merged.projects.active && (!PROJECTS[merged.projects.active.id] || !Number.isFinite(Number(merged.projects.active.endsAt)))) merged.projects.active = null;
+        merged.expedition = { active: null, ...(saved.expedition || {}) };
+        if (merged.expedition.active) {
+          const mission = merged.expedition.active;
+          const valid = EXPEDITIONS[mission.id] && Number.isFinite(Number(mission.endsAt));
+          merged.expedition.active = valid ? {
+            id: mission.id,
+            startedAt: Number(mission.startedAt) || Date.now(),
+            endsAt: Number(mission.endsAt),
+            team: Array.isArray(mission.team) ? mission.team.filter(id => STAFF[id]).slice(0, 2) : [],
+            chance: Number(mission.chance) || .7,
+            roll: Number.isFinite(Number(mission.roll)) ? Number(mission.roll) : Math.random()
+          } : null;
+        }
         merged.buffs = saved.buffs && typeof saved.buffs === "object" ? saved.buffs : {};
         if (merged.currentEvent && !EVENTS[merged.currentEvent.id]) merged.currentEvent = null;
         if (merged.route && !ROUTES[merged.route]) merged.route = null;
@@ -1212,6 +1305,7 @@
     let interactionUntil = 0;
     let notificationOpen = false;
     let logFilter = "all";
+    let expeditionDraft = [];
 
     function totalBuildings(s = state) { return Object.values(s.buildings).reduce((a,b) => a + Number(b || 0), 0); }
     function hasTech(id) { return !!state.tech[id]; }
@@ -1331,6 +1425,7 @@
     }
     function inferLogMeta(text) {
       const rules = [
+        [/远征/, "expedition", true],
         [/工业档案/, "achievement", true],
         [/里程碑/, "achievement", true],
         [/核心团队/, "staff", true],
@@ -1574,6 +1669,7 @@
     }
     function toggleStaff(id) {
       if (!state.staff.hired.includes(id)) return;
+      if (state.expedition.active && state.expedition.active.team.includes(id)) { toast("该专家正在远征中，暂时无法调整"); return; }
       if (state.staff.active.includes(id)) {
         state.staff.active = state.staff.active.filter(x => x !== id);
       } else {
@@ -1680,6 +1776,84 @@
       const index = PROJECT_ORDER.indexOf(id);
       return index >= 0 && (index === 0 || projectComplete(PROJECT_ORDER[index - 1]));
     }
+    function expeditionUnlocked(exp) {
+      if (exp.req?.project && !projectComplete(exp.req.project)) return false;
+      if (exp.req?.region && !state.regions[exp.req.region]) return false;
+      return true;
+    }
+    function expeditionReqText(exp) {
+      if (exp.req?.project) return "超级工程：" + PROJECTS[exp.req.project].name;
+      if (exp.req?.region) return "区域：" + REGIONS[exp.req.region].name;
+      return "无条件";
+    }
+    function reserveStaff() { return state.staff.hired.filter(id => !state.staff.active.includes(id)); }
+    function expeditionChance(id, team = expeditionDraft) {
+      const exp = EXPEDITIONS[id];
+      let chance = .62 + team.length * .11;
+      if (team.includes(exp.recommend)) chance += .16;
+      return Math.min(.96, chance);
+    }
+    function expeditionRewardFactor(id, team = expeditionDraft) {
+      const exp = EXPEDITIONS[id];
+      return 1 + team.length * .12 + (team.includes(exp.recommend) ? .18 : 0);
+    }
+    function toggleExpeditionStaff(id) {
+      if (state.expedition.active || !state.staff.hired.includes(id) || state.staff.active.includes(id) || (state.expedition.active && state.expedition.active.team.includes(id))) return;
+      if (expeditionDraft.includes(id)) expeditionDraft = expeditionDraft.filter(x => x !== id);
+      else if (expeditionDraft.length < 2) expeditionDraft.push(id);
+      render();
+    }
+    function startExpedition(id) {
+      const exp = EXPEDITIONS[id];
+      const team = expeditionDraft.filter(staffId => reserveStaff().includes(staffId)).slice(0, 2);
+      if (!exp || state.expedition.active || !expeditionUnlocked(exp) || team.length < 1 || !canAfford(exp.cost)) return;
+      pay(exp.cost);
+      const now = Date.now();
+      state.expedition.active = {
+        id,
+        startedAt: now,
+        endsAt: now + exp.duration * 1000,
+        team: [...team],
+        chance: expeditionChance(id, team),
+        roll: Math.random()
+      };
+      expeditionDraft = [];
+      addLog("远征出发：" + exp.name + "，队伍 " + team.map(staffId => STAFF[staffId].name).join("、") + "，预计 " + timeText(exp.duration) + " 后返回。", "expedition", false);
+      toast(exp.name + " 远征已出发", true); render();
+    }
+    function resolveExpedition() {
+      const active = state.expedition.active;
+      if (!active || Date.now() < active.endsAt) return false;
+      const exp = EXPEDITIONS[active.id];
+      if (!exp) { state.expedition.active = null; return false; }
+      const success = active.roll <= active.chance;
+      const partial = !success && active.roll <= active.chance + .15;
+      const factor = success ? expeditionRewardFactor(active.id, active.team) : partial ? .45 : 0;
+      const gained = {};
+      if (factor > 0) {
+        Object.entries(exp.rewards).forEach(([res, range]) => {
+          const base = range[0] + Math.random() * (range[1] - range[0]);
+          const amount = Math.max(1, Math.round(base * factor));
+          gained[res] = (gained[res] || 0) + amount;
+        });
+        grant(gained);
+      }
+      state.stats.expeditionRuns++;
+      if (success) state.stats.expeditionSuccess++;
+      else if (partial) state.stats.expeditionPartial++;
+      else state.stats.expeditionFail++;
+      const names = active.team.map(staffId => STAFF[staffId]?.name || staffId).join("、");
+      const result = success ? "成功" : partial ? "部分成功" : "失败";
+      const gainText = Object.entries(gained).map(([res, val]) => "+" + fmt(val) + " " + RES[res].name).join("，");
+      addLog("远征归来：" + exp.name + " " + result + (names ? "，队伍 " + names : "") + (gainText ? "，带回 " + gainText : "，未带回有效物资") + "。", "expedition", true);
+      toast("远征归来：" + exp.name + " · " + result, success);
+      state.expedition.active = null;
+      saveGame();
+      return true;
+    }
+    function checkExpedition() {
+      if (resolveExpedition()) render();
+    }
     function startProject(id) {
       const project = PROJECTS[id];
       if (!project || state.projects.active || projectComplete(id) || !projectUnlocked(id) || !canAfford(project.cost)) return;
@@ -1707,6 +1881,7 @@
         legacy: { ...state.legacy },
         iterations: { ...state.iterations },
         projects: { completed: [...state.projects.completed], active: state.projects.active ? { ...state.projects.active } : null },
+        expedition: { active: state.expedition.active ? { ...state.expedition.active, team: [...state.expedition.active.team] } : null },
         staff: { hired: [...state.staff.hired], active: [...state.staff.active] },
         claimedAchievements: [...state.claimedAchievements],
         log: state.log.slice(0, 199).map(entry => ({ ...entry })),
@@ -1718,6 +1893,7 @@
       state.legacy = carried.legacy;
       state.iterations = carried.iterations;
       state.projects = carried.projects;
+      state.expedition = carried.expedition;
       state.staff = carried.staff;
       state.claimedAchievements = carried.claimedAchievements;
       state.stats.prestiges = carried.prestiges;
@@ -1954,17 +2130,46 @@
         return '<div class="team-slot ' + (person ? "filled" : "") + '"><div class="team-slot-label">CORE SLOT 0' + (i+1) + '</div>' + (person ? '<div class="team-slot-name">' + person.name + '</div><div class="team-slot-role">' + person.title + ' · 已生效</div><button class="btn small ghost" data-action="toggle-staff" data-id="' + state.staff.active[i] + '">移出核心组</button>' : '<div class="team-slot-name muted">席位空缺</div><div class="team-slot-role">从下方团队调入专家</div>') + '</div>';
       }).join("");
       const cards = Object.entries(STAFF).map(([id,person]) => {
-        const hired = state.staff.hired.includes(id), isActive = state.staff.active.includes(id), met = staffRequirementMet(id);
+        const hired = state.staff.hired.includes(id), isActive = state.staff.active.includes(id), away = !!(state.expedition.active && state.expedition.active.team.includes(id)), met = staffRequirementMet(id);
         const req = [person.req.tech ? "科技：" + TECHS[person.req.tech].name : "", person.req.project ? "工程：" + PROJECTS[person.req.project].name : ""].filter(Boolean).join(" · ");
         let action;
         if (!hired) action = '<button class="btn primary full" data-action="hire-staff" data-id="' + id + '" ' + (!met || !canAfford(person.cost) ? "disabled" : "") + '>' + icon(met ? "users" : "lock") + (met ? "招募加入" : "条件未满足") + '</button>';
+        else if (away) action = '<button class="btn full" disabled>' + icon("expedition") + '远征任务中</button>';
         else if (isActive) action = '<button class="btn full" data-action="toggle-staff" data-id="' + id + '">移出核心组</button>';
         else action = '<button class="btn full" data-action="toggle-staff" data-id="' + id + '" ' + (state.staff.active.length >= 3 ? "disabled" : "") + '>' + (state.staff.active.length >= 3 ? "核心席位已满" : "调入核心组") + '</button>';
-        return '<section class="panel staff-card ' + (isActive ? "active" : "") + ' ' + (!met && !hired ? "locked" : "") + '"><div class="staff-avatar" style="background:' + person.color + '">' + person.initials + '</div><div class="staff-main"><div class="staff-head"><div><div class="staff-name">' + person.name + '</div><div class="staff-title">' + person.title + '</div></div><span class="staff-status">' + (isActive ? "核心席位" : hired ? "待命" : met ? "可招募" : "未解锁") + '</span></div><div class="staff-quote">“' + person.quote + '”</div><div class="staff-effects">' + person.effectText.map(t => '<span>' + t + '</span>').join("") + '</div><div class="staff-req">' + (hired ? "已加入团队" : "招募条件：" + req) + '</div>' + (!hired ? '<div class="costs">' + costHTML(person.cost) + '</div>' : "") + '<div class="staff-foot">' + action + '</div></div></section>';
+        return '<section class="panel staff-card ' + (isActive ? "active" : "") + ' ' + (!met && !hired ? "locked" : "") + '"><div class="staff-avatar" style="background:' + person.color + '">' + person.initials + '</div><div class="staff-main"><div class="staff-head"><div><div class="staff-name">' + person.name + '</div><div class="staff-title">' + person.title + '</div></div><span class="staff-status">' + (away ? "远征中" : isActive ? "核心席位" : hired ? "待命" : met ? "可招募" : "未解锁") + '</span></div><div class="staff-quote">“' + person.quote + '”</div><div class="staff-effects">' + person.effectText.map(t => '<span>' + t + '</span>').join("") + '</div><div class="staff-req">' + (away ? "已派往远征任务" : hired ? "已加入团队" : "招募条件：" + req) + '</div>' + (!hired ? '<div class="costs">' + costHTML(person.cost) + '</div>' : "") + '<div class="staff-foot">' + action + '</div></div></section>';
       }).join("");
       return pageHead("CORE TEAM", "核心团队", "招募工业专家并安排三个核心席位。每位专家提供独特全局增益，席位之间需要取舍，团队会跨产业重组保留。", '<div class="panel-tag">' + state.staff.hired.length + ' / ' + Object.keys(STAFF).length + ' 已招募</div>') +
         '<div class="team-slots">' + slots + '</div>' +
         '<div class="team-grid">' + cards + '</div>';
+    }
+
+    function expedRewardText(exp) {
+      return Object.entries(exp.rewards).map(([res, range]) => RES[res].name + " " + fmt(range[0]) + "–" + fmt(range[1])).join(" · ");
+    }
+    function expeditionDurationText(sec) { return sec >= 3600 ? (sec / 3600) + " 小时" : Math.round(sec / 60) + " 分"; }
+    function renderExpeditions() {
+      const active = state.expedition.active, activeExp = active ? EXPEDITIONS[active.id] : null;
+      const reserve = reserveStaff();
+      expeditionDraft = expeditionDraft.filter(id => reserve.includes(id));
+      const remaining = active ? Math.max(0, Math.ceil((active.endsAt - Date.now()) / 1000)) : 0;
+      const activeProgress = activeExp ? Math.min(100, (1 - remaining / activeExp.duration) * 100) : 0;
+      const hero = active && activeExp ? '<section class="panel expedition-hero"><div class="expedition-hero-top"><div class="expedition-hero-icon">' + icon(activeExp.icon) + '</div><div><div class="expedition-hero-title">' + activeExp.name + ' · 远征进行中</div><div class="expedition-hero-sub">队伍：' + active.team.map(id => STAFF[id] ? STAFF[id].name : id).join("、") + ' · 成功率 ' + Math.round(active.chance*100) + '%</div></div><div class="expedition-hero-clock"><strong class="mono">' + timeText(remaining) + '</strong><span>' + (remaining > 0 ? "预计返回" : "正在结算") + '</span></div></div><div class="progress" style="margin-top:14px"><span style="width:' + activeProgress + '%"></span></div></section>' : "";
+      const chips = Object.entries(STAFF).filter(([id]) => state.staff.hired.includes(id)).map(([id,person]) => {
+        const isCore = state.staff.active.includes(id), isAway = active && active.team.includes(id), selected = expeditionDraft.includes(id);
+        const cls = selected ? "selected" : isCore ? "core" : isAway ? "away" : "";
+        const attrs = !active && !isCore && !isAway ? ' data-action="expedition-staff" data-id="' + id + '"' : "";
+        return '<button class="crew-chip ' + cls + '"' + attrs + '>' + person.name + ' · ' + person.title + (isCore ? " · 核心" : isAway ? " · 远征中" : selected ? " · 已编入" : "") + '</button>';
+      }).join("");
+      const crew = '<section class="panel crew-panel"><div class="crew-head"><div class="crew-title">' + icon("users") + '远征编队</div><div class="panel-tag">' + (active ? "任务归来后可重新编队" : "从待命专家中选择 1–2 人") + '</div></div><div class="crew-chips">' + (chips || '<span class="muted" style="font-size:10px">尚未招募专家，请先在「团队」页招募。</span>') + '</div></section>';
+      const cards = Object.entries(EXPEDITIONS).map(([id,exp]) => {
+        const unlocked = expeditionUnlocked(exp), chance = Math.round(expeditionChance(id)*100), factor = expeditionRewardFactor(id);
+        const canStart = !active && unlocked && expeditionDraft.length > 0 && canAfford(exp.cost);
+        const rec = STAFF[exp.recommend];
+        return '<section class="panel expedition-card ' + (unlocked ? "" : "locked") + '"><div class="expedition-card-top"><div class="expedition-icon">' + icon(exp.icon) + '</div><div><div class="expedition-tag">' + exp.tag + '</div><div class="expedition-name">' + exp.name + '</div></div><div class="count-badge mono" style="margin-left:auto">' + expeditionDurationText(exp.duration) + '</div></div><div class="expedition-desc">' + exp.desc + '</div><div class="expedition-meta"><span>成功率 ' + chance + '%</span><span>预计收益 ×' + factor.toFixed(2) + '</span><span class="good">推荐 ' + rec.name + ' / ' + rec.title + '</span></div><div class="expedition-rewards">可能带回：<strong>' + expedRewardText(exp) + '</strong></div><div class="expedition-req">' + (unlocked ? "已解锁" : "需要 " + expeditionReqText(exp)) + '</div><div class="costs">' + costHTML(exp.cost) + '</div><button class="btn primary full" data-action="start-expedition" data-id="' + id + '" ' + (canStart ? "" : "disabled") + '>' + icon("expedition") + (active ? "已有远征进行中" : !unlocked ? "尚未解锁" : expeditionDraft.length < 1 ? "请先编队" : "出发远征") + '</button></section>';
+      }).join("");
+      return pageHead("FIELD EXPEDITIONS", "远征探索", "派遣待命专家进入高风险区域，离线也会继续。成功率由队伍人数与推荐专家决定，归来时可能带回资源、量子单元或工业蓝图。", '<div class="panel-tag">' + state.stats.expeditionRuns + ' 次远征 · ' + state.stats.expeditionSuccess + ' 次成功</div>') + hero + crew +
+        '<div class="expedition-grid">' + cards + '</div>';
     }
 
     function renderProjects() {
@@ -2085,7 +2290,7 @@
       return pageHead("GROUP HEADQUARTERS", "集团总部", "切换管理方针，用工业蓝图购买永久升级。产业重组会重置园区，但经验和蓝图会留下。", '<div class="panel-tag">重组 ' + state.stats.prestiges + ' 次</div>') +
         '<section class="panel hq-summary"><div><div class="blueprint-label">可用工业蓝图</div><div class="blueprint-number mono">' + fmt(state.blueprints) + ' <span style="font-size:11px;color:var(--muted)">BP</span></div><div class="blueprint-label" style="margin-top:7px">来自产业重组，永久保留</div></div><div class="building-icon" style="width:58px;height:58px;border-color:rgba(169,149,213,.3);background:rgba(169,149,213,.12);color:var(--purple)">' + icon("blueprint") + '</div></section>' +
         '<div class="hq-cols"><section class="panel"><div class="panel-head"><div class="panel-title">' + icon("policy") + '管理方针</div><div class="panel-tag">随时切换 · 只生效一项</div></div><div class="panel-body"><div class="policy-grid">' + policyCards + '</div></div></section>' +
-          '<section class="prestige-card"><div class="contract-client">INDUSTRIAL RESTRUCTURING</div><h3>产业重组</h3><p>封存当前园区，保留蓝图、超级工程、工艺迭代、核心团队、工业档案与永久升级。重组只计算本轮园区指数，不会把永久工程重复变现。</p><div class="prestige-gain"><span>' + (canPrestige ? "本次可获得" : "重组门槛：工业指数 " + fmt(requirement)) + '</span><strong class="mono">' + (canPrestige ? "+" + gain + " BP" : fmt(score()) + " / " + fmt(requirement)) + '</strong></div><button class="btn primary full" data-action="prestige" ' + (!canPrestige ? "disabled" : "") + '>' + icon("reset") + (canPrestige ? "执行产业重组" : "尚未达到重组条件") + '</button></section></div>' +
+          '<section class="prestige-card"><div class="contract-client">INDUSTRIAL RESTRUCTURING</div><h3>产业重组</h3><p>封存当前园区，保留蓝图、超级工程、工艺迭代、核心团队、工业档案、进行中的远征与永久升级。重组只计算本轮园区指数，不会把永久工程重复变现。</p><div class="prestige-gain"><span>' + (canPrestige ? "本次可获得" : "重组门槛：工业指数 " + fmt(requirement)) + '</span><strong class="mono">' + (canPrestige ? "+" + gain + " BP" : fmt(score()) + " / " + fmt(requirement)) + '</strong></div><button class="btn primary full" data-action="prestige" ' + (!canPrestige ? "disabled" : "") + '>' + icon("reset") + (canPrestige ? "执行产业重组" : "尚未达到重组条件") + '</button></section></div>' +
         routePanelHTML() + automationPanelHTML() +
         '<section class="panel" style="margin-top:14px"><div class="panel-head"><div class="panel-title">' + icon("blueprint") + '永久升级</div><div class="panel-tag">工业蓝图不会被重组清空</div></div><div class="panel-body"><div class="legacy-grid">' + legacyCards + '</div></div></section>';
     }
@@ -2226,7 +2431,7 @@
       document.getElementById("site-card").innerHTML = '<div class="site-eyebrow">SITE 001 / ONLINE</div><div class="site-name">北辰工业园</div><div class="site-level"><span>' + rank.name + '</span><span class="mono">LV.' + rank.level + '</span></div><div class="xp-track"><div class="xp-fill" style="width:' + xp + '%"></div></div>';
       const claimable = QUESTS.filter(q => !state.claimed.includes(q.id) && q.value(state) >= q.target).length;
       document.getElementById("nav").innerHTML = NAV.map(([id,name,ic]) => '<button class="nav-btn ' + (state.tab===id?"active":"") + '" data-action="nav" data-id="' + id + '">' + icon(ic) + name + (id==="milestones" && claimable ? '<span class="nav-badge">' + claimable + '</span>' : "") + '</button>').join("");
-      const views = { overview: renderOverview, buildings: renderBuildings, crafting: renderCrafting, synthesis: renderSynthesis, contracts: renderContracts, regions: renderRegions, projects: renderProjects, research: renderResearch, milestones: renderMilestones, archive: renderArchive, headquarters: renderHeadquarters, team: renderTeam, logs: renderLogs };
+      const views = { overview: renderOverview, buildings: renderBuildings, crafting: renderCrafting, synthesis: renderSynthesis, contracts: renderContracts, regions: renderRegions, projects: renderProjects, expeditions: renderExpeditions, research: renderResearch, milestones: renderMilestones, archive: renderArchive, headquarters: renderHeadquarters, team: renderTeam, logs: renderLogs };
       patchContent(document.getElementById("content"), (views[state.tab] || renderOverview)(), state.tab);
       renderNotificationUI();
       lastRender = Date.now();
@@ -2237,7 +2442,7 @@
     }
     function closeModal() { document.getElementById("modal-root").innerHTML = ""; }
     function showHelp() {
-      openModal("厂长经营手册", '<strong>目标：</strong>从回收废钢起步，建立涵盖能源、冶金、电子、量子与轨道制造的现代工业体系。<div class="help-steps"><div class="help-step"><span class="step-num">1</span><div><strong>先电力，后产能</strong><br>所有耗电建筑共享电网。供电不足时，全厂效率会按供电比例下降；储能与循环经济科技能压低需求。</div></div><div class="help-step"><span class="step-num">2</span><div><strong>打通多层产业链</strong><br>钢铝 → 电路与硅料 → 电池与部件 → 芯片、机器人、量子单元。高级配方需要先研究对应科技。</div></div><div class="help-step"><span class="step-num">3</span><div><strong>处理调度事件</strong><br>总览页会不定期出现园区事件。短期增益和即时资源都要付代价，没有“全都要”的选项。</div></div><div class="help-step"><span class="step-num">4</span><div><strong>把园区铺向全球</strong><br>「布局」页一次性投资区域基地，永久增强电力、研究、合约或建造成本。区域越多，协同越强。</div></div><div class="help-step"><span class="step-num">5</span><div><strong>托管与产业纲领</strong><br>拥有 12 座建筑后可启用自动补电和自动打造；研究全自动流水线后，还可在总部选择互斥产业纲领，解锁专属建筑。</div></div><div class="help-step"><span class="step-num">6</span><div><strong>把目光放到小时级工程</strong><br>「工程」页的超级工程会持续 45 分钟到 12 小时，离线也计时。完工后永久增强产能并解锁稀土与超导产业链。</div></div><div class="help-step"><span class="step-num">7</span><div><strong>组建核心团队</strong><br>「团队」页招募 8 名工业专家，但只有 3 个核心席位。专家加成覆盖产能、能源、研究、合约与边疆资源，团队跨重组保留。</div></div><div class="help-step"><span class="step-num">8</span><div><strong>档案、迭代与离线</strong><br>「档案」页的工业成就会提升永久档案等级；科技页底部的工艺迭代也是长期研究。产业重组保留档案、工程、迭代与团队，只重置本轮园区。离线按 50% 效率结算，最多 8 小时。</div></div></div>', '<button class="btn primary" data-action="close-modal">开始经营</button>');
+      openModal("厂长经营手册", '<strong>目标：</strong>从回收废钢起步，建立涵盖能源、冶金、电子、量子与轨道制造的现代工业体系。<div class="help-steps"><div class="help-step"><span class="step-num">1</span><div><strong>先电力，后产能</strong><br>所有耗电建筑共享电网。供电不足时，全厂效率会按供电比例下降；储能与循环经济科技能压低需求。</div></div><div class="help-step"><span class="step-num">2</span><div><strong>打通多层产业链</strong><br>钢铝 → 电路与硅料 → 电池与部件 → 芯片、机器人、量子单元。高级配方需要先研究对应科技。</div></div><div class="help-step"><span class="step-num">3</span><div><strong>处理调度事件</strong><br>总览页会不定期出现园区事件。短期增益和即时资源都要付代价，没有“全都要”的选项。</div></div><div class="help-step"><span class="step-num">4</span><div><strong>把园区铺向全球</strong><br>「布局」页一次性投资区域基地，永久增强电力、研究、合约或建造成本。区域越多，协同越强。</div></div><div class="help-step"><span class="step-num">5</span><div><strong>托管与产业纲领</strong><br>拥有 12 座建筑后可启用自动补电和自动打造；研究全自动流水线后，还可在总部选择互斥产业纲领，解锁专属建筑。</div></div><div class="help-step"><span class="step-num">6</span><div><strong>把目光放到小时级工程</strong><br>「工程」页的超级工程会持续 45 分钟到 12 小时，离线也计时。完工后永久增强产能并解锁稀土与超导产业链。</div></div><div class="help-step"><span class="step-num">7</span><div><strong>团队与远征</strong><br>「团队」页招募 8 名工业专家，但只有 3 个核心席位。待命专家可在「远征」页编队外出，离线计时，带回稀土、超导、量子与工业蓝图；出征期间不能调入核心席位。</div></div><div class="help-step"><span class="step-num">8</span><div><strong>档案、迭代与离线</strong><br>「档案」页的工业成就会提升永久档案等级；科技页底部的工艺迭代也是长期研究。产业重组保留档案、工程、迭代与团队，只重置本轮园区。离线按 50% 效率结算，最多 8 小时。</div></div></div>', '<button class="btn primary" data-action="close-modal">开始经营</button>');
     }
 
     // 交互期间冻结后台重绘：避免按压中的按钮被 innerHTML 替换，导致 click 丢失。
@@ -2274,13 +2479,14 @@
         "invest-region": () => investRegion(id), "event-choice": () => resolveEvent(Number(id)),
         "dismiss-event": dismissEvent, "toggle-auto": () => toggleAuto(id), "auto-craft": () => setAutoCraft(id || ""),
         "start-project": () => startProject(id), "buy-iteration": () => buyIteration(id),
+        "expedition-staff": () => toggleExpeditionStaff(id), "start-expedition": () => startExpedition(id),
         "route-choose": () => pickRoute(id), "confirm-route": () => commitRoute(id),
         "hire-staff": () => hireStaff(id), "toggle-staff": () => toggleStaff(id),
         "claim-achievement": () => claimAchievement(id),
         policy: () => setPolicy(id), legacy: () => buyLegacy(id),
         prestige: () => {
           const gain = prestigeGain();
-          openModal("产业重组确认", "本次重组将<strong>清空建筑、资源、科技、打造队列与合成核心</strong>，但保留全部工业蓝图、永久升级、超级工程、工艺迭代、核心团队与工业档案。产业纲领与本轮科技将重置。预计获得 <strong>" + gain + " BP</strong>。<br><br>本轮工业指数：" + fmt(score()) + "，重组后将从一座光伏电站重新起步。", '<button class="btn" data-action="close-modal">暂不重组</button><button class="btn primary" data-action="confirm-prestige">确认产业重组</button>');
+          openModal("产业重组确认", "本次重组将<strong>清空建筑、资源、科技、打造队列与合成核心</strong>，但保留全部工业蓝图、永久升级、超级工程、工艺迭代、核心团队、工业档案与进行中的远征。产业纲领与本轮科技将重置。预计获得 <strong>" + gain + " BP</strong>。<br><br>本轮工业指数：" + fmt(score()) + "，重组后将从一座光伏电站重新起步。", '<button class="btn" data-action="close-modal">暂不重组</button><button class="btn primary" data-action="confirm-prestige">确认产业重组</button>');
         },
         "confirm-prestige": () => { closeModal(); doPrestige(); },
         sell: () => sellSteel(false), "sell-all": () => sellSteel(true), save: () => saveGame(true),
@@ -2330,6 +2536,7 @@
         state.stats.playtime += dt;
         Object.keys(state.buffs).forEach(type => { if (!state.buffs[type] || state.buffs[type].expires <= now) delete state.buffs[type]; });
         checkProjects();
+        checkExpedition();
         runAutomation();
       }
       if (pointerHeld && now - pointerDownAt > 15000) releasePointer();
