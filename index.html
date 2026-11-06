@@ -236,6 +236,15 @@
     .cost.lack { color: var(--red); }
     .building-foot { display: flex; align-items: center; gap: 10px; }
     .building-foot .btn { flex: 1; }
+    .building-modes { display: flex; gap: 4px; margin: 9px 0 11px; }
+    .mode-btn { flex: 1; border: 1px solid var(--line); border-radius: 5px; padding: 4px 5px; background: transparent; color: var(--faint); font-size: 8px; cursor: pointer; }
+    .mode-btn.active { color: var(--accent); border-color: rgba(240,161,58,.35); background: var(--accent-soft); }
+    .challenge-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px; margin: 12px 0; }
+    .challenge-choice { text-align: left; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: rgba(255,255,255,.015); color: var(--muted); cursor: pointer; }
+    .challenge-choice strong { display: block; color: var(--text); font-size: 10px; margin-bottom: 3px; }
+    .challenge-choice span { font-size: 9px; line-height: 1.45; }
+    .challenge-choice.active { border-color: rgba(240,161,58,.35); background: var(--accent-soft); }
+    .challenge-choice.active strong { color: var(--accent); }
     .total-rate { color: var(--muted); font-size: 10px; white-space: nowrap; }
 
     .inventory-strip { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 16px; }
@@ -451,6 +460,21 @@
     .route-effects { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0 13px; }
     .route-effects span { font-size: 9px; border-radius: 4px; padding: 4px 7px; background: var(--green-soft); color: var(--green); }
     .route-lock-note { padding: 13px; border-radius: 8px; background: rgba(255,255,255,.02); color: var(--muted); font-size: 10px; }
+    .market-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px; }
+    .market-card { padding: 15px; }
+    .market-head { display: flex; align-items: center; gap: 8px; }
+    .market-name { font-size: 12px; font-weight: 750; }
+    .market-trend { margin-left: auto; font-size: 9px; }
+    .trend-up { color: var(--green); }
+    .trend-down { color: var(--red); }
+    .market-price { font-size: 20px; font-weight: 800; margin: 10px 0 3px; }
+    .market-spread { color: var(--muted); font-size: 9px; margin-bottom: 10px; }
+    .market-stock { display: flex; justify-content: space-between; color: var(--faint); font-size: 9px; margin-bottom: 10px; }
+    .market-actions { display: flex; gap: 6px; }
+    .market-actions .btn { flex: 1; }
+    @media (max-width: 980px) {
+      .market-grid { grid-template-columns: minmax(0,1fr); }
+    }
     .team-slots { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
     .team-slot { min-height: 112px; padding: 14px; border: 1px dashed #354049; border-radius: 9px; display: flex; flex-direction: column; justify-content: center; gap: 8px; background: rgba(255,255,255,.012); }
     .team-slot.filled { border-style: solid; border-color: rgba(85,199,160,.25); background: var(--green-soft); }
@@ -474,6 +498,10 @@
     .staff-req { color: var(--muted); font-size: 9px; margin-bottom: 8px; }
     .staff-foot { display: flex; gap: 7px; align-items: center; }
     .staff-foot .btn { flex: 1; }
+    .staff-level { color: var(--purple); font-size: 9px; margin-left: 4px; }
+    .staff-xp { height: 3px; border-radius: 3px; background: var(--line); overflow: hidden; margin: 6px 0 8px; }
+    .staff-xp span { display: block; height: 100%; background: var(--purple); }
+    .staff-gear-select { width: 100%; margin: 4px 0 8px; background: var(--panel-3); color: var(--muted); border: 1px solid var(--line); border-radius: 5px; padding: 5px 7px; font-size: 9px; }
     .crew-panel { padding: 15px; margin-bottom: 13px; }
     .crew-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
     .crew-title { font-size: 12px; font-weight: 750; display: flex; align-items: center; gap: 7px; }
@@ -722,7 +750,7 @@
     "use strict";
 
     const SAVE_KEY = "steel-dynasty-save-v1";
-    const VERSION = 8;
+    const VERSION = 9;
 
     const ICONS = {
       factory: '<path d="M3 21V9l6 3V8l6 4V4h4v17H3Z"/><path d="M7 17h2m3 0h2m3 0h2M17 4V1"/>',
@@ -914,7 +942,7 @@
     const NAV = [
       ["overview", "总览", "overview"], ["buildings", "建筑", "building"],
       ["crafting", "打造", "craft"], ["synthesis", "合成", "synth"],
-      ["contracts", "合约", "contract"], ["regions", "布局", "globe"],
+      ["contracts", "合约", "contract"], ["market", "市场", "cash"], ["regions", "布局", "globe"],
       ["projects", "工程", "project"], ["expeditions", "远征", "expedition"], ["research", "科技", "tech"],
       ["milestones", "里程碑", "quests"], ["archive", "档案", "archive"],
       ["headquarters", "总部", "hq"], ["team", "团队", "users"], ["logs", "日志", "log"]
@@ -986,6 +1014,41 @@
         rewards: { quantum: [40, 90], blueprints: [14, 24], research: [80000, 140000] }
       }
     };
+
+    const EXPEDITION_EVENTS = {
+      routine: { name: "例行巡航", desc: "航线稳定，按计划推进。", duration: 1, reward: 1, chance: 0 },
+      clear: { name: "窗口晴好", desc: "天气与信号都难得配合，任务更容易成功且更快返回。", duration: .85, reward: 1, chance: .05 },
+      rich: { name: "富集带", desc: "探测到异常富集区，回收量增加，但暴露风险也更高。", duration: 1, reward: 1.35, chance: -.05 },
+      storm: { name: "突发风暴", desc: "恶劣环境拖慢行动，成功难度上升，但风险补偿更丰厚。", duration: 1.25, reward: 1.2, chance: -.12 },
+      salvage: { name: "意外回收", desc: "途中发现额外可用物资，不改变既定航线。", duration: 1, reward: 1.15, chance: 0 }
+    };
+    const EXPEDITION_GEAR = {
+      fieldKit: { name: "标准外勤包", icon: "box", desc: "成功率 +4%", chance: .04, reward: 0, duration: 0 },
+      survey: { name: "精密测绘仪", icon: "research", desc: "成功率 +6%", chance: .06, reward: 0, duration: 0 },
+      cargo: { name: "扩容货舱", icon: "truck", desc: "远征收益 +15%", chance: 0, reward: .15, duration: 0 },
+      shield: { name: "防暴护盾", icon: "shield", desc: "成功率 +3%，耗时 -10%", chance: .03, reward: 0, duration: -.1 },
+      chrono: { name: "时间同步器", icon: "clock", desc: "远征耗时 -15%", chance: 0, reward: 0, duration: -.15 },
+      beacon: { name: "量子信标", icon: "quantum", desc: "成功率 +3%，收益 +25%", chance: .03, reward: .25, duration: 0 }
+    };
+    const MARKET_BASE = {
+      steel: { price: 6, stock: 500, lot: 25 }, aluminum: { price: 15, stock: 220, lot: 10 },
+      circuits: { price: 40, stock: 120, lot: 5 }, batteries: { price: 100, stock: 60, lot: 2 },
+      chips: { price: 900, stock: 20, lot: 1 }, rareEarth: { price: 250, stock: 90, lot: 5 },
+      superconductor: { price: 1200, stock: 30, lot: 1 }, quantum: { price: 5200, stock: 8, lot: 1 }
+    };
+    const BUILDING_MODES = {
+      balanced: { name: "标准", output: 1, power: 1, gen: 1 },
+      output: { name: "高负荷", output: 1.25, power: 1.2, gen: 1.15 },
+      eco: { name: "节能", output: .85, power: .7, gen: .9 }
+    };
+    const CHALLENGES = {
+      none: { name: "标准经营", desc: "无额外修正", bp: 0, output: 1, power: 1, contract: 1, cost: 1 },
+      scarcity: { name: "资源紧缩", desc: "全厂产出 -25%，重组 BP +50%", bp: .5, output: .75, power: 1, contract: 1, cost: 1 },
+      volatile: { name: "动荡市场", desc: "合约收益 -30%，重组 BP +35%", bp: .35, output: 1, power: 1, contract: .7, cost: 1 },
+      blackout: { name: "电网老化", desc: "发电能力 -20%，重组 BP +25%", bp: .25, output: 1, power: .8, contract: 1, cost: 1 },
+      inflation: { name: "成本膨胀", desc: "建筑成本 +20%，重组 BP +30%", bp: .3, output: 1, power: 1, contract: 1, cost: 1.2 }
+    };
+    const STAFF_LEVEL_THRESHOLDS = [0, 80, 200, 400, 700, 1100];
 
     const PROJECT_ORDER = ["hydrogen", "deepsea", "spaceElevator", "lunar", "fusionRing"];
     const PROJECTS = {
@@ -1215,10 +1278,12 @@
         },
         tech: {}, modules: { automation: 0, grid: 0, nano: 0, material: 0, ai: 0, quantum: 0, geo: 0, will: 0 }, queue: [], claimed: [],
         route: null, staff: { hired: [], active: [] }, claimedAchievements: [], career: {},
+        buildingModes: {}, market: { prices: {}, stock: {}, trend: {}, nextAt: 0 },
+        challenge: "none", staffXP: {}, gear: { owned: [], equipped: {} },
         legacy: { startup: 0, heritage: 0, grid: 0, craft: 0, market: 0, knowledge: 0 },
         iterations: { output: 0, power: 0, material: 0, research: 0, craft: 0, trade: 0 },
         projects: { completed: [], active: null }, expedition: { active: null },
-        contracts: [], policy: "balanced", regions: { home: true }, auto: { power: false, craft: "" },
+        contracts: [], policy: "balanced", regions: { home: true }, auto: { power: false, craft: "", build: "", contracts: false, iteration: false, projects: false },
         buffs: {}, currentEvent: null, nextEventAt: 0, lastEvent: "",
         stats: {
           steelLifetime: 0, aluminumLifetime: 0, siliconLifetime: 0, circuitsLifetime: 0, batteriesLifetime: 0, chipsLifetime: 0,
@@ -1254,6 +1319,39 @@
         merged.legacy = { ...fresh.legacy, ...(saved.legacy || {}) };
         merged.regions = { ...fresh.regions, ...(saved.regions || {}) };
         merged.auto = { ...fresh.auto, ...(saved.auto || {}) };
+        if (merged.auto.build && !BUILDINGS[merged.auto.build]) merged.auto.build = "";
+        ["contracts","iteration","projects"].forEach(key => { merged.auto[key] = !!merged.auto[key]; });
+        merged.buildingModes = {};
+        if (saved.buildingModes && typeof saved.buildingModes === "object") {
+          Object.entries(saved.buildingModes).forEach(([id, mode]) => {
+            if (BUILDINGS[id] && BUILDING_MODES[mode]) merged.buildingModes[id] = mode;
+          });
+        }
+        merged.market = { ...fresh.market, ...(saved.market || {}) };
+        ["prices","stock","trend"].forEach(key => {
+          merged.market[key] = saved.market && saved.market[key] ? { ...saved.market[key] } : {};
+        });
+        Object.keys(MARKET_BASE).forEach(res => {
+          ["prices","stock"].forEach(key => {
+            const value = Number(merged.market[key][res]);
+            if (!Number.isFinite(value) || value < 0) delete merged.market[key][res];
+          });
+          merged.market.trend[res] = Number(merged.market.trend[res]) || 0;
+        });
+        merged.market.nextAt = Number(merged.market.nextAt) || 0;
+        merged.challenge = CHALLENGES[saved.challenge] ? saved.challenge : "none";
+        merged.staffXP = saved.staffXP && typeof saved.staffXP === "object" ? { ...saved.staffXP } : {};
+        Object.keys(merged.staffXP).forEach(id => {
+          const value = Number(merged.staffXP[id]);
+          if (!STAFF[id] || !Number.isFinite(value) || value < 0) delete merged.staffXP[id];
+          else merged.staffXP[id] = value;
+        });
+        merged.gear = { owned: [], equipped: {}, ...(saved.gear || {}) };
+        merged.gear.owned = [...new Set(Array.isArray(merged.gear.owned) ? merged.gear.owned.filter(id => EXPEDITION_GEAR[id]) : [])];
+        merged.gear.equipped = saved.gear && saved.gear.equipped && typeof saved.gear.equipped === "object" ? { ...saved.gear.equipped } : {};
+        Object.entries(merged.gear.equipped).forEach(([staffId, gearId]) => {
+          if (!STAFF[staffId] || !merged.gear.owned.includes(gearId)) delete merged.gear.equipped[staffId];
+        });
         merged.iterations = { ...fresh.iterations, ...(saved.iterations || {}) };
         merged.projects = { completed: [], active: null, ...(saved.projects || {}) };
         merged.projects.completed = Array.isArray(merged.projects.completed) ? [...new Set(merged.projects.completed.filter(id => PROJECTS[id]))] : [];
@@ -1269,7 +1367,8 @@
             endsAt: Number(mission.endsAt),
             team: Array.isArray(mission.team) ? mission.team.filter(id => STAFF[id]).slice(0, 2) : [],
             chance: Number(mission.chance) || .7,
-            roll: Number.isFinite(Number(mission.roll)) ? Number(mission.roll) : Math.random()
+            roll: Number.isFinite(Number(mission.roll)) ? Number(mission.roll) : Math.random(),
+            event: EXPEDITION_EVENTS[mission.event] ? mission.event : "routine"
           } : null;
         }
         merged.buffs = saved.buffs && typeof saved.buffs === "object" ? saved.buffs : {};
@@ -1328,6 +1427,7 @@
     let lastNoticeHTML = "";
     let logFilter = "all";
     let expeditionDraft = [];
+    let selectedChallenge = "none";
 
     function totalBuildings(s = state) { return Object.values(s.buildings).reduce((a,b) => a + Number(b || 0), 0); }
     function careerStats(s = state) {
@@ -1357,8 +1457,28 @@
     }
     function iterationBonus(type) { return (state.iterations[type] || 0) * ITERATIONS[type].step; }
     function routeEffect(type) { return state.route && ROUTES[state.route] ? (ROUTES[state.route].effects[type] || 0) : 0; }
+    function staffXP(id) { return state.staffXP[id] || 0; }
+    function staffLevel(id) {
+      const xp = staffXP(id);
+      let level = 1;
+      for (let i = 1; i < STAFF_LEVEL_THRESHOLDS.length; i++) if (xp >= STAFF_LEVEL_THRESHOLDS[i]) level = i + 1;
+      return Math.min(5, level);
+    }
+    function staffEffectMultiplier(id) { return 1 + (staffLevel(id) - 1) * .08; }
+    function staffLevelInfo(id) {
+      const level = staffLevel(id), xp = staffXP(id);
+      const next = level < 5 ? STAFF_LEVEL_THRESHOLDS[level] : null;
+      const prev = STAFF_LEVEL_THRESHOLDS[level - 1] || 0;
+      return { level, xp, next, progress: next ? Math.min(100, (xp - prev) / (next - prev) * 100) : 100 };
+    }
+    function awardStaffXP(ids, amount) {
+      if (!Array.isArray(ids) || !Number.isFinite(amount) || amount <= 0) return;
+      ids.forEach(id => {
+        if (STAFF[id] && state.staff.hired.includes(id)) state.staffXP[id] = staffXP(id) + amount;
+      });
+    }
     function staffBonus(type) {
-      return state.staff.active.reduce((sum, id) => sum + ((STAFF[id]?.effects?.[type]) || 0), 0);
+      return state.staff.active.reduce((sum, id) => sum + ((STAFF[id]?.effects?.[type]) || 0) * staffEffectMultiplier(id), 0);
     }
     function archiveBonus(type) {
       const count = state.claimedAchievements.length;
@@ -1369,27 +1489,28 @@
     }
     function getRates(atTime = Date.now()) {
       const policy = POLICIES[state.policy] || POLICIES.balanced;
+      const challenge = CHALLENGES[state.challenge] || CHALLENGES.none;
       let capacity = 0, demand = 0;
       Object.entries(BUILDINGS).forEach(([id,b]) => {
-        const n = state.buildings[id] || 0;
-        capacity += (b.powerGen || 0) * n;
+        const n = state.buildings[id] || 0, mode = buildingMode(id);
+        capacity += (b.powerGen || 0) * n * mode.gen;
         const deepseaDiscount = id === "deepsea" && hasTech("deepseaEngineering") ? .8 : 1;
-        demand += (b.powerUse || 0) * n * deepseaDiscount;
+        demand += (b.powerUse || 0) * n * mode.power * deepseaDiscount;
       });
       capacity *= (1 + state.modules.grid * .15) * (hasTech("smartGrid") ? 1.25 : 1) * (hasTech("superconductingGrid") ? 1.5 : 1) * (1 + state.legacy.grid * .1)
-        * (1 + regionBonus("power")) * (1 + projectBonus("power")) * (1 + iterationBonus("power")) * (1 + staffBonus("power")) * (1 + archiveBonus("power")) * buffMult("power", atTime);
+        * (1 + regionBonus("power")) * (1 + projectBonus("power")) * (1 + iterationBonus("power")) * (1 + staffBonus("power")) * (1 + archiveBonus("power")) * challenge.power * buffMult("power", atTime);
       demand *= policy.power * (hasTech("energyStorage") ? .9 : 1) * (hasTech("circularEconomy") ? .85 : 1) * (1 + routeEffect("powerDemand"));
       const efficiency = demand > 0 ? Math.min(1, capacity / demand) : 1;
       const mult = (1 + state.modules.automation * .2) * (1 + state.modules.quantum * .3) * (1 + state.modules.will * .4)
         * (hasTech("automation") ? 1.5 : 1) * (hasTech("orbital") ? 1.5 : 1)
         * (hasTech("orbitalLogistics") ? 1.5 : 1) * (hasTech("matterPrinting") ? 1.25 : 1)
         * (1 + state.legacy.heritage * .12) * (1 + regionBonus("all")) * (1 + projectBonus("all"))
-        * (1 + iterationBonus("output")) * (1 + routeEffect("output")) * (1 + staffBonus("all")) * (1 + archiveBonus("all")) * buffMult("production", atTime);
+        * (1 + iterationBonus("output")) * (1 + routeEffect("output")) * (1 + staffBonus("all")) * (1 + archiveBonus("all")) * challenge.output * buffMult("production", atTime);
       const rates = {};
       PRODUCTION_KEYS.forEach(r => { rates[r] = 0; });
       Object.entries(BUILDINGS).forEach(([id,b]) => {
-        const n = state.buildings[id] || 0;
-        Object.entries(b.produces).forEach(([r,v]) => { rates[r] = (rates[r] || 0) + v * n; });
+        const n = state.buildings[id] || 0, mode = buildingMode(id);
+        Object.entries(b.produces).forEach(([r,v]) => { rates[r] = (rates[r] || 0) + v * n * mode.output; });
       });
       Object.keys(rates).forEach(r => { rates[r] *= efficiency * mult * (r === "cash" || r === "research" ? 1 : policy.output); });
       const iterationMaterial = 1 + iterationBonus("material");
@@ -1417,11 +1538,19 @@
     function buildingLocked(b) {
       return (b.tech && !hasTech(b.tech)) || (b.project && !projectComplete(b.project)) || (b.route && state.route !== b.route);
     }
+    function buildingMode(id) { return BUILDING_MODES[state.buildingModes[id] || "balanced"] || BUILDING_MODES.balanced; }
+    function setBuildingMode(id, mode) {
+      if (!BUILDINGS[id] || !BUILDING_MODES[mode] || !state.buildings[id]) return;
+      state.buildingModes[id] = mode;
+      addLog("产线专精：" + BUILDINGS[id].name + " 切换为「" + BUILDING_MODES[mode].name + "」。");
+      render();
+    }
     function buildingCost(id, offset = 0) {
       const b = BUILDINGS[id], n = (state.buildings[id] || 0) + offset;
       const discount = (hasTech("iot") ? .9 : 1) * (hasTech("matterPrinting") ? .85 : 1) * (1 - regionBonus("discount")) * (1 - projectBonus("discount"));
+      const challenge = CHALLENGES[state.challenge] || CHALLENGES.none;
       const cost = {};
-      Object.entries(b.cost).forEach(([r,v]) => { cost[r] = Math.ceil(v * Math.pow(b.scale, n) * discount); });
+      Object.entries(b.cost).forEach(([r,v]) => { cost[r] = Math.ceil(v * Math.pow(b.scale, n) * discount * challenge.cost); });
       return cost;
     }
     function moduleCost(id) {
@@ -1502,7 +1631,7 @@
       catch (e) { if (showToast) toast("存档失败：浏览器存储不可用"); }
     }
 
-    function buyBuilding(id) {
+    function buyBuilding(id, fromTick = false) {
       const b = BUILDINGS[id];
       if (!b || buildingLocked(b)) return;
       const limit = state.buyMode === "max" ? 1000 : Number(state.buyMode);
@@ -1515,7 +1644,7 @@
       if (bought) {
         addLog("建成 " + b.name + " ×" + bought + "，生产线已接入。");
         toast(b.name + " ×" + bought + " 建造完成", true);
-        render();
+        if (fromTick) renderFromTick(); else render();
       }
     }
 
@@ -1554,12 +1683,14 @@
       const m = MODULES[id]; if (!m) return;
       const cost = moduleCost(id); if (!canAfford(cost)) return;
       pay(cost); state.modules[id]++; state.stats.synthesized++;
+      awardStaffXP(state.staff.active, 5);
       addLog(m.name + " 合成成功，核心等级提升至 Lv." + state.modules[id] + "。");
       toast(m.name + " 已升级至 Lv." + state.modules[id], true); render();
     }
     function researchTech(id) {
       const t = TECHS[id]; if (!t || hasTech(id) || !t.prereq.every(hasTech) || (t.project && !projectComplete(t.project)) || !canAfford(t.cost)) return;
       pay(t.cost); state.tech[id] = true;
+      awardStaffXP(state.staff.active, 10);
       addLog("技术突破：" + t.name + " 已应用到工业园。");
       toast("研究完成：" + t.name, true); render();
     }
@@ -1579,6 +1710,50 @@
       toast("钢材订单回款 " + money(income), true); render();
     }
 
+    function ensureMarket(force = false) {
+      const now = Date.now();
+      if (!state.market.nextAt || force) {
+        Object.entries(MARKET_BASE).forEach(([res, data]) => {
+          if (!Number.isFinite(state.market.prices[res])) state.market.prices[res] = data.price;
+          if (!Number.isFinite(state.market.stock[res])) state.market.stock[res] = data.stock;
+          if (!Number.isFinite(state.market.trend[res])) state.market.trend[res] = 0;
+        });
+        state.market.nextAt = now + 10 * 60 * 1000;
+      }
+      if (now < state.market.nextAt) return;
+      Object.entries(MARKET_BASE).forEach(([res, data]) => {
+        const old = state.market.prices[res] || data.price;
+        const next = Math.max(data.price * .55, Math.min(data.price * 1.75, old * (.85 + Math.random() * .3)));
+        state.market.trend[res] = old ? next / old - 1 : 0;
+        state.market.prices[res] = next;
+        state.market.stock[res] = Math.min(data.stock * 1.5, (state.market.stock[res] || 0) + data.stock * .35);
+      });
+      state.market.nextAt = now + 10 * 60 * 1000;
+    }
+    function marketPrice(res) { return state.market.prices[res] || MARKET_BASE[res].price; }
+    function marketTrade(res, direction, all = false) {
+      if (!MARKET_BASE[res] || !RES[res]) return;
+      ensureMarket();
+      const lot = MARKET_BASE[res].lot;
+      if (direction === "sell") {
+        const qty = all ? Math.floor(state[res] / lot) * lot : lot;
+        if (qty < lot || state[res] < qty) return;
+        const income = qty * marketPrice(res) * .9;
+        state[res] -= qty;
+        state.cash += income;
+        addLog("现货卖出：" + RES[res].name + " ×" + fmt(qty) + "，回款 " + money(income) + "。", "trade", false);
+      } else {
+        const affordable = Math.floor(state.cash / (marketPrice(res) * 1.25 * lot)) * lot;
+        const qty = Math.min(lot, state.market.stock[res] || 0, affordable);
+        if (qty < lot) return;
+        const cost = qty * marketPrice(res) * 1.25;
+        state.cash -= cost;
+        state[res] += qty;
+        state.market.stock[res] -= qty;
+        addLog("现货买入：" + RES[res].name + " ×" + fmt(qty) + "，支出 " + money(cost) + "。", "trade", false);
+      }
+      render();
+    }
     function contractUnlocked(item) {
       const lifetime = { aluminum: "aluminumLifetime", circuits: "circuitsLifetime", batteries: "batteriesLifetime", chips: "chipsLifetime", robots: "robotsLifetime", quantum: "quantumLifetime", rareEarth: "rareEarthLifetime", superconductor: "superconductorLifetime" };
       const stats = careerStats();
@@ -1607,7 +1782,7 @@
       const level = Math.floor(state.stats.contractsDone / 5);
       const rewardMult = (1 + level * .2) * (hasTech("logisticsAI") ? 1.25 : 1) * (1 + state.legacy.market * .2)
         * (1 + regionBonus("contract")) * (1 + projectBonus("contract")) * (1 + iterationBonus("trade")) * (1 + routeEffect("contract"))
-        * (1 + staffBonus("contract")) * (hasTech("orbitalLogistics") ? 1.25 : 1);
+        * (1 + staffBonus("contract")) * (hasTech("orbitalLogistics") ? 1.25 : 1) * (CHALLENGES[state.challenge]?.contract || 1);
       return {
         id: "c" + Date.now() + Math.floor(Math.random()*100000),
         client: CONTRACT_CLIENTS[Math.floor(Math.random() * CONTRACT_CLIENTS.length)],
@@ -1630,17 +1805,19 @@
         state.contracts = contracts;
       }
     }
-    function completeContract(id) {
+    function completeContract(id, fromTick = false) {
       const i = state.contracts.findIndex(c => String(c.id) === String(id));
       if (i < 0) return;
       const contract = state.contracts[i];
       if (!canAfford(contract.need)) return;
       pay(contract.need); grant(contract.reward);
       state.stats.contractsDone++;
+      awardStaffXP(state.staff.active, 2);
       addLog("合约交付：" + contract.client + " / " + contract.title + "，回款 " + money(contract.reward.cash) + "。");
       const replacement = makeContract();
       if (replacement) state.contracts[i] = replacement;
-      toast("合约履约完成，客户信誉提升", true); render();
+      toast("合约履约完成，客户信誉提升", true);
+      if (fromTick) renderFromTick(); else render();
     }
     function refreshContracts() {
       if (state.cash < 600) return;
@@ -1747,8 +1924,10 @@
     }
     function automationUnlocked() { return totalBuildings() >= 12 || hasTech("automation"); }
     function toggleAuto(field) {
-      if (!automationUnlocked() || !["power","craft"].includes(field)) return;
-      state.auto[field] = field === "power" ? !state.auto.power : (state.auto.craft ? "" : "gear");
+      if (!automationUnlocked() || !["power","craft","contracts","iteration","projects"].includes(field)) return;
+      if (field === "power") state.auto.power = !state.auto.power;
+      else if (field === "craft") state.auto.craft = state.auto.craft ? "" : "gear";
+      else state.auto[field] = !state.auto[field];
       render();
     }
     function setAutoCraft(id) {
@@ -1781,6 +1960,23 @@
           queueCraft(id, true);
         }
       }
+      if (automationUnlocked() && state.auto.build && BUILDINGS[state.auto.build]) {
+        const id = state.auto.build, cost = buildingCost(id);
+        if (!buildingLocked(BUILDINGS[id]) && canAfford(cost) && state.cash >= (cost.cash || 0) * 1.5) buyBuilding(id, true);
+      }
+      if (automationUnlocked() && state.auto.contracts) {
+        const contract = state.contracts.find(c => canAfford(c.need));
+        if (contract) completeContract(contract.id, true);
+      }
+      if (automationUnlocked() && state.auto.iteration) {
+        const candidates = Object.entries(ITERATIONS).filter(([id,item]) => state.iterations[id] < item.max && state.research >= iterationCost(id) * 1.5)
+          .sort((a,b) => iterationCost(a[0]) - iterationCost(b[0]));
+        if (candidates.length) buyIteration(candidates[0][0], true);
+      }
+      if (automationUnlocked() && state.auto.projects && !state.projects.active) {
+        const next = PROJECT_ORDER.find(id => !projectComplete(id) && projectUnlocked(id) && canAfford(PROJECTS[id].cost));
+        if (next) startProject(next, true);
+      }
       ensureEvent();
     }
     function buyLegacy(id) {
@@ -1794,16 +1990,45 @@
       const item = ITERATIONS[id];
       return Math.ceil(item.base * Math.pow(item.growth, level));
     }
-    function buyIteration(id) {
+    function buyIteration(id, fromTick = false) {
       const item = ITERATIONS[id], level = state.iterations[id], cost = iterationCost(id, level);
       if (!item || level >= item.max || state.research < cost) return;
       state.research -= cost; state.iterations[id]++;
+      awardStaffXP(state.staff.active, 3);
       addLog("长期研究：" + item.name + " 达到 Lv." + state.iterations[id] + "。");
-      render();
+      if (fromTick) renderFromTick(); else render();
     }
     function projectUnlocked(id) {
       const index = PROJECT_ORDER.indexOf(id);
       return index >= 0 && (index === 0 || projectComplete(PROJECT_ORDER[index - 1]));
+    }
+    function gearBonus(staffId, type) {
+      const item = EXPEDITION_GEAR[state.gear.equipped[staffId]];
+      return item ? (item[type] || 0) : 0;
+    }
+    function expeditionGearBonus(team, type) { return team.reduce((sum, id) => sum + gearBonus(id, type), 0); }
+    function equipGear(staffId, gearId) {
+      if (!state.staff.hired.includes(staffId) || (gearId && !state.gear.owned.includes(gearId))) return;
+      Object.keys(state.gear.equipped).forEach(id => {
+        if (state.gear.equipped[id] === gearId) delete state.gear.equipped[id];
+      });
+      if (gearId) state.gear.equipped[staffId] = gearId;
+      else delete state.gear.equipped[staffId];
+      addLog("装备调整：" + STAFF[staffId].name + (gearId ? " 配备「" + EXPEDITION_GEAR[gearId].name + "」" : " 卸下装备") + "。", "management", false);
+      render();
+    }
+    function maybeDropGear(success, partial) {
+      const chance = state.gear.owned.length === 0 ? 1 : success ? .25 : partial ? .1 : 0;
+      if (Math.random() >= chance) return;
+      const pool = Object.keys(EXPEDITION_GEAR).filter(id => !state.gear.owned.includes(id));
+      if (!pool.length) {
+        grant({ research: 500 });
+        addLog("远征装备已满，重复物资折算为 500 研究点。", "expedition", false);
+        return;
+      }
+      const id = pool[Math.floor(Math.random() * pool.length)];
+      state.gear.owned.push(id);
+      addLog("远征装备获得：「" + EXPEDITION_GEAR[id].name + "」。", "expedition", true);
     }
     function expeditionUnlocked(exp) {
       if (exp.req?.project && !projectComplete(exp.req.project)) return false;
@@ -1838,16 +2063,20 @@
       if (!exp || state.expedition.active || !expeditionUnlocked(exp) || team.length < 1 || !canAfford(exp.cost)) return;
       pay(exp.cost);
       const now = Date.now();
+      const eventIds = Object.keys(EXPEDITION_EVENTS), eventId = eventIds[Math.floor(Math.random() * eventIds.length)], event = EXPEDITION_EVENTS[eventId];
+      const durationMult = Math.max(.5, event.duration * (1 + expeditionGearBonus(team, "duration")));
+      const chance = Math.max(.05, Math.min(.97, expeditionChance(id, team) + event.chance + expeditionGearBonus(team, "chance")));
       state.expedition.active = {
         id,
         startedAt: now,
-        endsAt: now + exp.duration * 1000,
+        endsAt: now + exp.duration * durationMult * 1000,
         team: [...team],
-        chance: expeditionChance(id, team),
-        roll: Math.random()
+        chance,
+        roll: Math.random(),
+        event: eventId
       };
       expeditionDraft = [];
-      addLog("远征出发：" + exp.name + "，队伍 " + team.map(staffId => STAFF[staffId].name).join("、") + "，预计 " + timeText(exp.duration) + " 后返回。", "expedition", false);
+      addLog("远征出发：" + exp.name + " / " + event.name + "，队伍 " + team.map(staffId => STAFF[staffId].name).join("、") + "，预计 " + timeText(exp.duration * durationMult) + " 后返回。", "expedition", false);
       toast(exp.name + " 远征已出发", true); render();
     }
     function resolveExpedition() {
@@ -1857,7 +2086,9 @@
       if (!exp) { state.expedition.active = null; return false; }
       const success = active.roll <= active.chance;
       const partial = !success && active.roll <= active.chance + .15;
-      const factor = success ? expeditionRewardFactor(active.id, active.team) : partial ? .45 : 0;
+      const event = EXPEDITION_EVENTS[active.event] || EXPEDITION_EVENTS.routine;
+      const gearReward = 1 + expeditionGearBonus(active.team, "reward");
+      const factor = success ? expeditionRewardFactor(active.id, active.team) * gearReward * event.reward : partial ? .45 * gearReward * event.reward : 0;
       const gained = {};
       if (factor > 0) {
         Object.entries(exp.rewards).forEach(([res, range]) => {
@@ -1868,13 +2099,15 @@
         grant(gained);
       }
       state.stats.expeditionRuns++;
+      awardStaffXP(active.team, Math.max(5, Math.round(exp.duration / 36 * (success ? 1 : partial ? .6 : .3))));
       if (success) state.stats.expeditionSuccess++;
       else if (partial) state.stats.expeditionPartial++;
       else state.stats.expeditionFail++;
+      maybeDropGear(success, partial);
       const names = active.team.map(staffId => STAFF[staffId]?.name || staffId).join("、");
       const result = success ? "成功" : partial ? "部分成功" : "失败";
       const gainText = Object.entries(gained).map(([res, val]) => "+" + fmt(val) + " " + RES[res].name).join("，");
-      addLog("远征归来：" + exp.name + " " + result + (names ? "，队伍 " + names : "") + (gainText ? "，带回 " + gainText : "，未带回有效物资") + "。", "expedition", true);
+      addLog("远征归来：" + exp.name + " / " + event.name + " " + result + (names ? "，队伍 " + names : "") + (gainText ? "，带回 " + gainText : "，未带回有效物资") + "。", "expedition", true);
       toast("远征归来：" + exp.name + " · " + result, success);
       state.expedition.active = null;
       saveGame();
@@ -1883,14 +2116,15 @@
     function checkExpedition() {
       if (resolveExpedition()) renderFromTick();
     }
-    function startProject(id) {
+    function startProject(id, fromTick = false) {
       const project = PROJECTS[id];
       if (!project || state.projects.active || projectComplete(id) || !projectUnlocked(id) || !canAfford(project.cost)) return;
       pay(project.cost);
       const now = Date.now();
       state.projects.active = { id, startedAt: now, endsAt: now + project.duration * 1000 };
       addLog("超级工程启动：" + project.name + "，预计 " + timeText(project.duration) + " 后完工。");
-      toast(project.name + " 已开工", true); render();
+      toast(project.name + " 已开工", true);
+      if (fromTick) renderFromTick(); else render();
     }
     function checkProjects(atTime = Date.now(), silent = false) {
       const active = state.projects.active;
@@ -1899,13 +2133,23 @@
       if (!project || projectComplete(active.id)) { state.projects.active = null; return false; }
       state.projects.completed.push(active.id);
       state.projects.active = null;
+      awardStaffXP(state.staff.active, 50);
       addLog("超级工程完工：" + project.name + "，集团获得永久产能增益。");
       if (!silent) toast("超级工程完工：" + project.name, true);
       return true;
     }
-    function doPrestige() {
-      const gain = prestigeGain();
-      if (score() < prestigeRequirement() || gain < 1) return;
+    function openPrestigeModal() {
+      const baseGain = prestigeGain();
+      const challenge = CHALLENGES[selectedChallenge] || CHALLENGES.none;
+      const gain = Math.max(1, Math.floor(baseGain * (1 + challenge.bp)));
+      const choices = '<div class="challenge-grid">' + Object.entries(CHALLENGES).map(([id,item]) => '<button class="challenge-choice ' + (selectedChallenge === id ? "active" : "") + '" data-action="challenge-select" data-id="' + id + '"><strong>' + item.name + '</strong><span>' + item.desc + '</span></button>').join("") + '</div>';
+      openModal("产业重组确认", "本次重组将<strong>清空建筑、资源、科技、打造队列与合成核心</strong>，但保留全部工业蓝图、永久升级、超级工程、工艺迭代、核心团队、工业档案与进行中的远征。产业纲领与本轮科技将重置。选择下一轮的挑战词条：<br>" + choices + "<br>本轮工业指数：" + fmt(score()) + "，预计获得 <strong>" + gain + " BP</strong>。", '<button class="btn" data-action="close-modal">暂不重组</button><button class="btn primary" data-action="confirm-prestige">确认产业重组</button>');
+    }
+    function doPrestige(challengeId = "none") {
+      const baseGain = prestigeGain();
+      const challenge = CHALLENGES[challengeId] || CHALLENGES.none;
+      const gain = Math.max(1, Math.floor(baseGain * (1 + challenge.bp)));
+      if (score() < prestigeRequirement() || baseGain < 1) return;
       const carried = {
         blueprints: state.blueprints + gain,
         legacy: { ...state.legacy },
@@ -1915,6 +2159,9 @@
         staff: { hired: [...state.staff.hired], active: [...state.staff.active] },
         claimedAchievements: [...state.claimedAchievements],
         claimed: [...state.claimed],
+        buildingModes: { ...state.buildingModes },
+        staffXP: { ...state.staffXP },
+        gear: { owned: [...state.gear.owned], equipped: { ...state.gear.equipped } },
         career: { ...state.career },
         log: state.log.slice(0, 199).map(entry => ({ ...entry })),
         prestiges: state.stats.prestiges + 1,
@@ -1925,6 +2172,7 @@
         carried.career[key] = (carried.career[key] || 0) + Number(value || 0);
       });
       state = newState();
+      state.challenge = challengeId;
       state.blueprints = carried.blueprints;
       state.legacy = carried.legacy;
       state.iterations = carried.iterations;
@@ -1933,6 +2181,9 @@
       state.staff = carried.staff;
       state.claimedAchievements = carried.claimedAchievements;
       state.claimed = carried.claimed;
+      state.buildingModes = carried.buildingModes;
+      state.staffXP = carried.staffXP;
+      state.gear = carried.gear;
       state.career = carried.career;
       state.stats.prestiges = carried.prestiges;
       state.stats.playtime = carried.playtime;
@@ -2059,10 +2310,11 @@
       if (!locked) {
         for (let i=0; i<(state.buyMode === "max" ? 1000 : Number(state.buyMode)); i++) { if (!canAfford(buildingCost(id,i))) break; buyable++; }
       }
-      const yields = Object.entries(b.produces).map(([res,v]) => '<div class="yield-chip"><span>' + RES[res].name + '产出</span><strong class="green mono">+' + fmt(v) + ' / 秒</strong></div>').join("");
-      const power = b.powerGen ? '<div class="yield-chip"><span>发电能力</span><strong class="accent mono">+' + b.powerGen + ' MW</strong></div>' : '<div class="yield-chip"><span>电力消耗</span><strong class="mono">' + b.powerUse + ' MW</strong></div>';
+      const yields = Object.entries(b.produces).map(([res,v]) => '<div class="yield-chip"><span>' + RES[res].name + '产出</span><strong class="green mono">+' + fmt(v * buildingMode(id).output) + ' / 秒</strong></div>').join("");
+      const power = b.powerGen ? '<div class="yield-chip"><span>发电能力</span><strong class="accent mono">+' + fmt(b.powerGen * buildingMode(id).gen) + ' MW</strong></div>' : '<div class="yield-chip"><span>电力消耗</span><strong class="mono">' + fmt(b.powerUse * buildingMode(id).power) + ' MW</strong></div>';
+      const modeUI = n && !locked ? '<div class="building-modes">' + Object.entries(BUILDING_MODES).map(([mode,m]) => '<button class="mode-btn ' + (buildingMode(id) === m ? "active" : "") + '" data-action="building-mode" data-building="' + id + '" data-mode="' + mode + '" title="产出 ×' + m.output + ' · 耗电 ×' + m.power + ' · 发电 ×' + m.gen + '">' + m.name + '</button>').join("") + '</div>' : "";
       return '<section class="panel building-card ' + (locked ? "locked" : "") + '"><div class="building-top"><div class="building-icon">' + icon(b.icon) + '</div><div><div class="building-name">' + b.name + '</div><div class="building-desc">' + b.desc + '</div></div><div class="count-badge mono">× ' + n + '</div></div><div class="building-yield">' + (yields || '<div class="yield-chip"><span>设施类型</span><strong>电力基础设施</strong></div>') + power + '</div>' +
-        (locked ? '<div class="prereq" style="margin:12px 0">' + icon("lock") + ' 需要' + (b.route ? "产业纲领：" + ROUTES[b.route].name : b.project ? "超级工程：" + PROJECTS[b.project].name : "科技：" + TECHS[b.tech].name) + '</div>' : '<div class="costs">' + costHTML(cost) + '</div>') +
+        (locked ? '<div class="prereq" style="margin:12px 0">' + icon("lock") + ' 需要' + (b.route ? "产业纲领：" + ROUTES[b.route].name : b.project ? "超级工程：" + PROJECTS[b.project].name : "科技：" + TECHS[b.tech].name) + '</div>' : '<div class="costs">' + costHTML(cost) + '</div>') + modeUI +
         '<div class="building-foot"><button class="btn primary" data-action="buy" data-id="' + id + '" ' + (!buyable ? "disabled" : "") + '>' + (locked ? "尚未解锁" : "建造" + (buyable > 1 ? " ×" + buyable : "")) + '</button>' + (n ? '<span class="total-rate">总计 ' + fmt(n * (b.powerGen || b.powerUse || 0)) + ' MW</span>' : "") + '</div></section>';
     }
 
@@ -2161,6 +2413,10 @@
         '<div class="archive-grid">' + cards + '</div>';
     }
 
+    function staffGearSelect(id) {
+      const current = state.gear.equipped[id] || "";
+      return '<select class="staff-gear-select" data-change="equip-staff" data-id="' + id + '" aria-label="远征装备"><option value="">无远征装备</option>' + state.gear.owned.map(gearId => '<option value="' + gearId + '" ' + (current === gearId ? "selected" : "") + '>' + EXPEDITION_GEAR[gearId].name + ' · ' + EXPEDITION_GEAR[gearId].desc + '</option>').join("") + '</select>';
+    }
     function renderTeam() {
       const active = state.staff.active.map(id => STAFF[id]);
       const slots = Array.from({ length: 3 }, (_, i) => {
@@ -2168,14 +2424,14 @@
         return '<div class="team-slot ' + (person ? "filled" : "") + '"><div class="team-slot-label">CORE SLOT 0' + (i+1) + '</div>' + (person ? '<div class="team-slot-name">' + person.name + '</div><div class="team-slot-role">' + person.title + ' · 已生效</div><button class="btn small ghost" data-action="toggle-staff" data-id="' + state.staff.active[i] + '">移出核心组</button>' : '<div class="team-slot-name muted">席位空缺</div><div class="team-slot-role">从下方团队调入专家</div>') + '</div>';
       }).join("");
       const cards = Object.entries(STAFF).map(([id,person]) => {
-        const hired = state.staff.hired.includes(id), isActive = state.staff.active.includes(id), away = !!(state.expedition.active && state.expedition.active.team.includes(id)), met = staffRequirementMet(id);
+        const hired = state.staff.hired.includes(id), isActive = state.staff.active.includes(id), away = !!(state.expedition.active && state.expedition.active.team.includes(id)), met = staffRequirementMet(id), levelInfo = staffLevelInfo(id);
         const req = [person.req.tech ? "科技：" + TECHS[person.req.tech].name : "", person.req.project ? "工程：" + PROJECTS[person.req.project].name : ""].filter(Boolean).join(" · ");
         let action;
         if (!hired) action = '<button class="btn primary full" data-action="hire-staff" data-id="' + id + '" ' + (!met || !canAfford(person.cost) ? "disabled" : "") + '>' + icon(met ? "users" : "lock") + (met ? "招募加入" : "条件未满足") + '</button>';
         else if (away) action = '<button class="btn full" disabled>' + icon("expedition") + '远征任务中</button>';
         else if (isActive) action = '<button class="btn full" data-action="toggle-staff" data-id="' + id + '">移出核心组</button>';
         else action = '<button class="btn full" data-action="toggle-staff" data-id="' + id + '" ' + (state.staff.active.length >= 3 ? "disabled" : "") + '>' + (state.staff.active.length >= 3 ? "核心席位已满" : "调入核心组") + '</button>';
-        return '<section class="panel staff-card ' + (isActive ? "active" : "") + ' ' + (!met && !hired ? "locked" : "") + '"><div class="staff-avatar" style="background:' + person.color + '">' + person.initials + '</div><div class="staff-main"><div class="staff-head"><div><div class="staff-name">' + person.name + '</div><div class="staff-title">' + person.title + '</div></div><span class="staff-status">' + (away ? "远征中" : isActive ? "核心席位" : hired ? "待命" : met ? "可招募" : "未解锁") + '</span></div><div class="staff-quote">“' + person.quote + '”</div><div class="staff-effects">' + person.effectText.map(t => '<span>' + t + '</span>').join("") + '</div><div class="staff-req">' + (away ? "已派往远征任务" : hired ? "已加入团队" : "招募条件：" + req) + '</div>' + (!hired ? '<div class="costs">' + costHTML(person.cost) + '</div>' : "") + '<div class="staff-foot">' + action + '</div></div></section>';
+        return '<section class="panel staff-card ' + (isActive ? "active" : "") + ' ' + (!met && !hired ? "locked" : "") + '"><div class="staff-avatar" style="background:' + person.color + '">' + person.initials + '</div><div class="staff-main"><div class="staff-head"><div><div class="staff-name">' + person.name + '</div><div class="staff-title">' + person.title + '<span class="staff-level">Lv.' + levelInfo.level + (hired ? ' · 效果 ×' + staffEffectMultiplier(id).toFixed(2) : '') + '</span></div></div><span class="staff-status">' + (away ? "远征中" : isActive ? "核心席位" : hired ? "待命" : met ? "可招募" : "未解锁") + '</span></div><div class="staff-quote">“' + person.quote + '”</div><div class="staff-effects">' + person.effectText.map(t => '<span>' + t + '</span>').join("") + '</div>' + (hired ? '<div class="staff-xp"><span style="width:' + levelInfo.progress + '%"></span></div>' + staffGearSelect(id) : '') + '<div class="staff-req">' + (away ? "已派往远征任务" : hired ? "已加入团队" : "招募条件：" + req) + '</div>' + (!hired ? '<div class="costs">' + costHTML(person.cost) + '</div>' : "") + '<div class="staff-foot">' + action + '</div></div></section>';
       }).join("");
       return pageHead("CORE TEAM", "核心团队", "招募工业专家并安排三个核心席位。每位专家提供独特全局增益，席位之间需要取舍，团队会跨产业重组保留。", '<div class="panel-tag">' + state.staff.hired.length + ' / ' + Object.keys(STAFF).length + ' 已招募</div>') +
         '<div class="team-slots">' + slots + '</div>' +
@@ -2192,7 +2448,7 @@
       expeditionDraft = expeditionDraft.filter(id => reserve.includes(id));
       const remaining = active ? Math.max(0, Math.ceil((active.endsAt - Date.now()) / 1000)) : 0;
       const activeProgress = activeExp ? Math.min(100, (1 - remaining / activeExp.duration) * 100) : 0;
-      const hero = active && activeExp ? '<section class="panel expedition-hero"><div class="expedition-hero-top"><div class="expedition-hero-icon">' + icon(activeExp.icon) + '</div><div><div class="expedition-hero-title">' + activeExp.name + ' · 远征进行中</div><div class="expedition-hero-sub">队伍：' + active.team.map(id => STAFF[id] ? STAFF[id].name : id).join("、") + ' · 成功率 ' + Math.round(active.chance*100) + '%</div></div><div class="expedition-hero-clock"><strong class="mono">' + timeText(remaining) + '</strong><span>' + (remaining > 0 ? "预计返回" : "正在结算") + '</span></div></div><div class="progress" style="margin-top:14px"><span style="width:' + activeProgress + '%"></span></div></section>' : "";
+      const hero = active && activeExp ? '<section class="panel expedition-hero"><div class="expedition-hero-top"><div class="expedition-hero-icon">' + icon(activeExp.icon) + '</div><div><div class="expedition-hero-title">' + activeExp.name + ' · ' + (EXPEDITION_EVENTS[active.event]?.name || "例行巡航") + '</div><div class="expedition-hero-sub">队伍：' + active.team.map(id => STAFF[id] ? STAFF[id].name : id).join("、") + ' · 成功率 ' + Math.round(active.chance*100) + '%</div></div><div class="expedition-hero-clock"><strong class="mono">' + timeText(remaining) + '</strong><span>' + (remaining > 0 ? "预计返回" : "正在结算") + '</span></div></div><div class="progress" style="margin-top:14px"><span style="width:' + activeProgress + '%"></span></div></section>' : "";
       const chips = Object.entries(STAFF).filter(([id]) => state.staff.hired.includes(id)).map(([id,person]) => {
         const isCore = state.staff.active.includes(id), isAway = active && active.team.includes(id), selected = expeditionDraft.includes(id);
         const cls = selected ? "selected" : isCore ? "core" : isAway ? "away" : "";
@@ -2287,6 +2543,17 @@
         }).join("") + '</div>';
     }
 
+    function renderMarket() {
+      ensureMarket();
+      const remaining = Math.max(0, Math.ceil((state.market.nextAt - Date.now()) / 1000));
+      return pageHead("SPOT MARKET", "现货市场", "价格每 10 分钟波动。卖出现货按牌价 90% 结算，补货按牌价 125% 结算；库存会随时间补充。", '<div class="panel-tag">下次调价 ' + timeText(remaining) + '</div>') +
+        '<div class="market-grid">' + Object.entries(MARKET_BASE).map(([res,data]) => {
+          const price = marketPrice(res), trend = state.market.trend[res] || 0, stock = state.market.stock[res] || 0;
+          const lot = data.lot;
+          return '<section class="panel market-card"><div class="market-head">' + icon(RES[res].icon) + '<span class="market-name">' + RES[res].name + '</span><span class="market-trend ' + (trend >= 0 ? "trend-up" : "trend-down") + '">' + (trend >= 0 ? "↑" : "↓") + ' ' + Math.abs(trend * 100).toFixed(1) + '%</span></div><div class="market-price mono">' + money(price) + ' <span style="font-size:10px;color:var(--muted)">/ ' + RES[res].unit + '</span></div><div class="market-spread">卖出 ¥' + fmt(price * .9) + ' · 买入 ¥' + fmt(price * 1.25) + '</div><div class="market-stock"><span>市场库存 ' + fmt(stock) + '</span><span>你的库存 ' + fmt(state[res]) + '</span></div><div class="market-actions"><button class="btn small" data-action="market-sell" data-id="' + res + '" ' + (state[res] < lot ? "disabled" : "") + '>卖出 ' + fmt(lot) + '</button><button class="btn small primary" data-action="market-buy" data-id="' + res + '" ' + (stock < lot || state.cash < price * 1.25 * lot ? "disabled" : "") + '>买入 ' + fmt(lot) + '</button></div></section>';
+        }).join("") + '</div>';
+    }
+
     function renderContracts() {
       const done = state.stats.contractsDone;
       return pageHead("TRADE NETWORK", "贸易合约", "完成客户采购，换取资金、研究点与商业信誉。信誉越高，高阶合约的回报越丰厚。", '<button class="btn small ghost" data-action="refresh-contracts" ' + (state.cash < 600 ? "disabled" : "") + '>' + icon("reset") + '刷新市场 · ¥600</button>') +
@@ -2315,7 +2582,7 @@
         return '<button class="segment ' + (state.auto.craft===id ? "active" : "") + '" data-action="auto-craft" data-id="' + id + '" ' + (locked ? "disabled" : "") + ' title="' + (locked ? "需科技：" + TECHS[r.tech].name : "目标库存 " + AUTO_TARGETS[id]) + '">' + r.name + '</button>';
       }).join("");
       return '<section class="panel" style="margin-top:14px"><div class="panel-head"><div class="panel-title">' + icon("toggle") + '自动化托管</div><div class="panel-tag">' + (unlocked ? "托管只处理重复操作" : "拥有 12 座建筑后解锁") + '</div></div><div class="panel-body">' +
-        (unlocked ? '<div class="auto-layout"><div class="auto-status"><div class="auto-line"><span>电网自动补容</span><button class="btn small ' + (state.auto.power ? "primary" : "") + '" data-action="toggle-auto" data-id="power">' + icon("power") + (state.auto.power ? "托管中" : "已关闭") + '</button></div><div class="auto-line"><span>自动打造产线</span><strong>' + (state.auto.craft ? RECIPES[state.auto.craft].name : "未启用") + '</strong></div><div class="auto-line"><span>当前队列</span><strong class="mono">' + state.queue.length + ' / 8</strong></div><div class="muted" style="font-size:9px;line-height:1.7;margin-top:9px">自动补电仅在电网负载超过 90% 且现金保留充足时执行；自动打造会在队列低于 2 且库存未达目标时补单。</div></div><div><div class="panel-subheading">自动打造目标</div><div class="craft-select">' + craftButtons + '</div></div></div>' : '<div class="empty">' + icon("lock") + '托管系统尚未解锁<br>建造 12 座建筑或研究全自动流水线后启用</div>') + '</div></section>';
+        (unlocked ? '<div class="auto-layout"><div class="auto-status"><div class="auto-line"><span>电网自动补容</span><button class="btn small ' + (state.auto.power ? "primary" : "") + '" data-action="toggle-auto" data-id="power">' + icon("power") + (state.auto.power ? "托管中" : "已关闭") + '</button></div><div class="auto-line"><span>自动打造产线</span><strong>' + (state.auto.craft ? RECIPES[state.auto.craft].name : "未启用") + '</strong></div><div class="auto-line"><span>当前队列</span><strong class="mono">' + state.queue.length + ' / 8</strong></div><div class="auto-line"><span>自动建造</span><select class="staff-gear-select" style="width:auto;max-width:180px" data-change="auto-build"><option value="">关闭</option>' + Object.entries(BUILDINGS).filter(([id,b]) => !buildingLocked(b)).map(([id,b]) => '<option value="' + id + '" ' + (state.auto.build === id ? "selected" : "") + '>' + b.name + '</option>').join("") + '</select></div><div class="auto-line"><span>自动交付合约</span><button class="btn small ' + (state.auto.contracts ? "primary" : "") + '" data-action="toggle-auto" data-id="contracts">' + (state.auto.contracts ? "托管中" : "已关闭") + '</button></div><div class="auto-line"><span>自动工艺迭代</span><button class="btn small ' + (state.auto.iteration ? "primary" : "") + '" data-action="toggle-auto" data-id="iteration">' + (state.auto.iteration ? "托管中" : "已关闭") + '</button></div><div class="auto-line"><span>自动超级工程</span><button class="btn small ' + (state.auto.projects ? "primary" : "") + '" data-action="toggle-auto" data-id="projects">' + (state.auto.projects ? "托管中" : "已关闭") + '</button></div><div class="muted" style="font-size:9px;line-height:1.7;margin-top:9px">自动建造保留 50% 现金；自动交付选择材料足够的合约；自动迭代保留 50% 研究点；自动工程按顺序启动，离线仍会继续。</div></div><div><div class="panel-subheading">自动打造目标</div><div class="craft-select">' + craftButtons + '</div></div></div>' : '<div class="empty">' + icon("lock") + '托管系统尚未解锁<br>建造 12 座建筑或研究全自动流水线后启用</div>') + '</div></section>';
     }
 
     function renderHeadquarters() {
@@ -2325,7 +2592,7 @@
         const level = state.legacy[id], maxed = level >= item.max, cost = legacyCost(id, level);
         return '<div class="legacy-card"><div class="legacy-head"><span class="legacy-name">' + icon(item.icon) + ' ' + item.name + '</span><span class="legacy-level">LV.' + level + ' / ' + item.max + '</span></div><div class="legacy-desc">' + item.desc + '</div><button class="btn small ' + (!maxed && state.blueprints >= cost ? "primary" : "") + '" data-action="legacy" data-id="' + id + '" ' + (maxed || state.blueprints < cost ? "disabled" : "") + '>' + (maxed ? "已满级" : "升级 · " + cost + " BP") + '</button></div>';
       }).join("");
-      return pageHead("GROUP HEADQUARTERS", "集团总部", "切换管理方针，用工业蓝图购买永久升级。产业重组会重置园区，但经验和蓝图会留下。", '<div class="panel-tag">重组 ' + state.stats.prestiges + ' 次</div>') +
+      return pageHead("GROUP HEADQUARTERS", "集团总部", "切换管理方针，用工业蓝图购买永久升级。产业重组会重置园区，但经验和蓝图会留下。", '<div class="panel-tag">重组 ' + state.stats.prestiges + ' 次 · ' + CHALLENGES[state.challenge].name + '</div>') +
         '<section class="panel hq-summary"><div><div class="blueprint-label">可用工业蓝图</div><div class="blueprint-number mono">' + fmt(state.blueprints) + ' <span style="font-size:11px;color:var(--muted)">BP</span></div><div class="blueprint-label" style="margin-top:7px">来自产业重组，永久保留</div></div><div class="building-icon" style="width:58px;height:58px;border-color:rgba(169,149,213,.3);background:rgba(169,149,213,.12);color:var(--purple)">' + icon("blueprint") + '</div></section>' +
         '<div class="hq-cols"><section class="panel"><div class="panel-head"><div class="panel-title">' + icon("policy") + '管理方针</div><div class="panel-tag">随时切换 · 只生效一项</div></div><div class="panel-body"><div class="policy-grid">' + policyCards + '</div></div></section>' +
           '<section class="prestige-card"><div class="contract-client">INDUSTRIAL RESTRUCTURING</div><h3>产业重组</h3><p>封存当前园区，保留蓝图、超级工程、工艺迭代、核心团队、工业档案、进行中的远征与永久升级。重组只计算本轮园区指数，不会把永久工程重复变现。</p><div class="prestige-gain"><span>' + (canPrestige ? "本次可获得" : "重组门槛：工业指数 " + fmt(requirement)) + '</span><strong class="mono">' + (canPrestige ? "+" + gain + " BP" : fmt(score()) + " / " + fmt(requirement)) + '</strong></div><button class="btn primary full" data-action="prestige" ' + (!canPrestige ? "disabled" : "") + '>' + icon("reset") + (canPrestige ? "执行产业重组" : "尚未达到重组条件") + '</button></section></div>' +
@@ -2506,7 +2773,7 @@
       const claimable = QUESTS.filter(q => !state.claimed.includes(q.id) && q.value(state) >= q.target).length;
       const navHTML = NAV.map(([id,name,ic]) => '<button class="nav-btn ' + (state.tab===id?"active":"") + '" data-action="nav" data-id="' + id + '">' + icon(ic) + name + (id==="milestones" && claimable ? '<span class="nav-badge">' + claimable + '</span>' : "") + '</button>').join("");
       patchElement(document.getElementById("nav"), navHTML);
-      const views = { overview: renderOverview, buildings: renderBuildings, crafting: renderCrafting, synthesis: renderSynthesis, contracts: renderContracts, regions: renderRegions, projects: renderProjects, expeditions: renderExpeditions, research: renderResearch, milestones: renderMilestones, archive: renderArchive, headquarters: renderHeadquarters, team: renderTeam, logs: renderLogs };
+      const views = { overview: renderOverview, buildings: renderBuildings, crafting: renderCrafting, synthesis: renderSynthesis, contracts: renderContracts, market: renderMarket, regions: renderRegions, projects: renderProjects, expeditions: renderExpeditions, research: renderResearch, milestones: renderMilestones, archive: renderArchive, headquarters: renderHeadquarters, team: renderTeam, logs: renderLogs };
       patchContent(document.getElementById("content"), (views[state.tab] || renderOverview)(), state.tab);
       renderNotificationUI();
       lastRender = Date.now();
@@ -2517,7 +2784,7 @@
     }
     function closeModal() { document.getElementById("modal-root").innerHTML = ""; }
     function showHelp() {
-      openModal("厂长经营手册", '<strong>目标：</strong>从回收废钢起步，建立涵盖能源、冶金、电子、量子与轨道制造的现代工业体系。<div class="help-steps"><div class="help-step"><span class="step-num">1</span><div><strong>先电力，后产能</strong><br>所有耗电建筑共享电网。供电不足时，全厂效率会按供电比例下降；储能与循环经济科技能压低需求。</div></div><div class="help-step"><span class="step-num">2</span><div><strong>打通多层产业链</strong><br>钢铝 → 电路与硅料 → 电池与部件 → 芯片、机器人、量子单元。高级配方需要先研究对应科技。</div></div><div class="help-step"><span class="step-num">3</span><div><strong>处理调度事件</strong><br>总览页会不定期出现园区事件。短期增益和即时资源都要付代价，没有“全都要”的选项。</div></div><div class="help-step"><span class="step-num">4</span><div><strong>把园区铺向全球</strong><br>「布局」页一次性投资区域基地，永久增强电力、研究、合约或建造成本。区域越多，协同越强。</div></div><div class="help-step"><span class="step-num">5</span><div><strong>托管与产业纲领</strong><br>拥有 12 座建筑后可启用自动补电和自动打造；研究全自动流水线后，还可在总部选择互斥产业纲领，解锁专属建筑。</div></div><div class="help-step"><span class="step-num">6</span><div><strong>把目光放到小时级工程</strong><br>「工程」页的超级工程会持续 45 分钟到 12 小时，离线也计时。完工后永久增强产能并解锁稀土与超导产业链。</div></div><div class="help-step"><span class="step-num">7</span><div><strong>团队与远征</strong><br>「团队」页招募 8 名工业专家，但只有 3 个核心席位。待命专家可在「远征」页编队外出，离线计时，带回稀土、超导、量子与工业蓝图；出征期间不能调入核心席位。</div></div><div class="help-step"><span class="step-num">8</span><div><strong>档案、迭代与离线</strong><br>「档案」页的工业成就会提升永久档案等级；科技页底部的工艺迭代也是长期研究。产业重组保留档案、工程、迭代与团队，只重置本轮园区。离线按 50% 效率结算，最多 8 小时。</div></div></div>', '<button class="btn primary" data-action="close-modal">开始经营</button>');
+      openModal("厂长经营手册", '<strong>目标：</strong>从回收废钢起步，建立涵盖能源、冶金、电子、量子与轨道制造的现代工业体系。<div class="help-steps"><div class="help-step"><span class="step-num">1</span><div><strong>先电力，后产能</strong><br>所有耗电建筑共享电网。供电不足时，全厂效率会按供电比例下降；储能与循环经济科技能压低需求。</div></div><div class="help-step"><span class="step-num">2</span><div><strong>打通多层产业链</strong><br>钢铝 → 电路与硅料 → 电池与部件 → 芯片、机器人、量子单元。高级配方需要先研究对应科技。</div></div><div class="help-step"><span class="step-num">3</span><div><strong>处理调度事件</strong><br>总览页会不定期出现园区事件。短期增益和即时资源都要付代价，没有“全都要”的选项。</div></div><div class="help-step"><span class="step-num">4</span><div><strong>把园区铺向全球</strong><br>「布局」页一次性投资区域基地，永久增强电力、研究、合约或建造成本。区域越多，协同越强。</div></div><div class="help-step"><span class="step-num">5</span><div><strong>托管与产业纲领</strong><br>拥有 12 座建筑后可启用自动补电和自动打造；研究全自动流水线后，还可在总部选择互斥产业纲领，解锁专属建筑。</div></div><div class="help-step"><span class="step-num">6</span><div><strong>把目光放到小时级工程</strong><br>「工程」页的超级工程会持续 45 分钟到 12 小时，离线也计时。完工后永久增强产能并解锁稀土与超导产业链。</div></div><div class="help-step"><span class="step-num">7</span><div><strong>团队与远征</strong><br>「团队」页招募 8 名工业专家，但只有 3 个核心席位。待命专家可在「远征」页编队外出，离线计时，带回稀土、超导、量子与工业蓝图；出征期间不能调入核心席位。</div></div><div class="help-step"><span class="step-num">8</span><div><strong>档案、迭代与离线</strong><br>「档案」页的工业成就会提升永久档案等级；科技页底部的工艺迭代也是长期研究。产业重组保留档案、工程、迭代与团队，只重置本轮园区。离线按 50% 效率结算，最多 8 小时。</div></div><div class="help-step"><span class="step-num">9</span><div><strong>六个后期系统</strong><br>「市场」每 10 分钟调价；建筑卡可切换标准/高负荷/节能；远征可掉装备；总部支持自动建造、合约、迭代和工程；重组时可选择挑战词条；专家通过科研与远征升级并强化效果。</div></div></div>', '<button class="btn primary" data-action="close-modal">开始经营</button>');
     }
 
     // 交互期间冻结后台重绘：避免按压中的按钮被 innerHTML 替换，导致 click 丢失。
@@ -2534,6 +2801,13 @@
       if (e.key === "Escape" && notificationOpen) closeNotifications();
     }, true);
 
+    document.addEventListener("change", e => {
+      const el = e.target.closest("[data-change]");
+      if (!el) return;
+      if (el.dataset.change === "equip-staff") equipGear(el.dataset.id, el.value);
+      if (el.dataset.change === "auto-build") { state.auto.build = el.value; render(); }
+    });
+
     document.addEventListener("click", e => {
       if (notificationOpen && !e.target.closest("#notify-wrap")) closeNotifications();
       const el = e.target.closest("[data-action]");
@@ -2548,9 +2822,11 @@
         "clear-logs": () => openModal("清空运营日志", "这会删除全部日志和通知记录，<strong>无法撤销</strong>。工业档案、成就与游戏进度不会受影响。", '<button class="btn" data-action="close-modal">保留日志</button><button class="btn primary" data-action="confirm-clear-logs">确认清空</button>'),
         "confirm-clear-logs": confirmClearLogs,
         "buy-mode": () => { state.buyMode = id; render(); },
-        buy: () => buyBuilding(id), craft: () => queueCraft(id), "cancel-craft": () => cancelCraft(id),
+        buy: () => buyBuilding(id), "building-mode": () => setBuildingMode(el.dataset.building, el.dataset.mode),
+        craft: () => queueCraft(id), "cancel-craft": () => cancelCraft(id),
         synth: () => synthesize(id), research: () => researchTech(id), claim: () => claimQuest(id),
         "complete-contract": () => completeContract(id), "refresh-contracts": refreshContracts,
+        "market-buy": () => marketTrade(id, "buy"), "market-sell": () => marketTrade(id, "sell"),
         "invest-region": () => investRegion(id), "event-choice": () => resolveEvent(Number(id)),
         "dismiss-event": dismissEvent, "toggle-auto": () => toggleAuto(id), "auto-craft": () => setAutoCraft(id || ""),
         "start-project": () => startProject(id), "buy-iteration": () => buyIteration(id),
@@ -2559,11 +2835,9 @@
         "hire-staff": () => hireStaff(id), "toggle-staff": () => toggleStaff(id),
         "claim-achievement": () => claimAchievement(id),
         policy: () => setPolicy(id), legacy: () => buyLegacy(id),
-        prestige: () => {
-          const gain = prestigeGain();
-          openModal("产业重组确认", "本次重组将<strong>清空建筑、资源、科技、打造队列与合成核心</strong>，但保留全部工业蓝图、永久升级、超级工程、工艺迭代、核心团队、工业档案与进行中的远征。产业纲领与本轮科技将重置。预计获得 <strong>" + gain + " BP</strong>。<br><br>本轮工业指数：" + fmt(score()) + "，重组后将从一座光伏电站重新起步。", '<button class="btn" data-action="close-modal">暂不重组</button><button class="btn primary" data-action="confirm-prestige">确认产业重组</button>');
-        },
-        "confirm-prestige": () => { closeModal(); doPrestige(); },
+        prestige: openPrestigeModal,
+        "challenge-select": () => { selectedChallenge = id; openPrestigeModal(); },
+        "confirm-prestige": () => { closeModal(); doPrestige(selectedChallenge); selectedChallenge = "none"; },
         sell: () => sellSteel(false), "sell-all": () => sellSteel(true), save: () => saveGame(true),
         help: showHelp, "close-modal": closeModal,
         "dismiss-tutorial": () => { state.tutorial = false; render(); },
@@ -2647,6 +2921,7 @@
       if (slept) applyOffline(lastTick);
       const dt = slept ? 0 : rawDt;
       lastTick = now;
+      ensureMarket();
       if (dt > 0) {
         const r = getRates();
         PRODUCTION_KEYS.forEach(res => {
@@ -2668,6 +2943,7 @@
     applyOffline();
     ensureContracts();
     ensureEvent();
+    ensureMarket();
     render();
     showOffline();
     setInterval(tick, 250);
