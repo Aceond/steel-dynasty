@@ -305,14 +305,14 @@
     .tutorial strong { color: var(--text); }
     .tutorial-close { border: 0; background: none; color: var(--muted); cursor: pointer; }
 
-    .modal-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(3,6,8,.75); backdrop-filter: blur(7px); display: grid; place-items: center; padding: 20px; }
-    .modal { width: min(480px, 100%); background: var(--panel-2); border: 1px solid #354049; border-radius: 14px; box-shadow: 0 28px 90px rgba(0,0,0,.5); overflow: hidden; animation: modal-in .18s ease-out; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(3,6,8,.75); backdrop-filter: blur(7px); display: grid; place-items: center; padding: 20px; overflow-y: auto; }
+    .modal { width: min(480px, 100%); max-height: calc(100vh - 40px); display: flex; flex-direction: column; background: var(--panel-2); border: 1px solid #354049; border-radius: 14px; box-shadow: 0 28px 90px rgba(0,0,0,.5); overflow: hidden; animation: modal-in .18s ease-out; }
     @keyframes modal-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }
-    .modal-head { padding: 19px 21px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+    .modal-head { padding: 19px 21px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex: 0 0 auto; }
     .modal-title { font-size: 16px; font-weight: 750; }
-    .modal-body { padding: 21px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .modal-body { padding: 21px; color: var(--muted); font-size: 12px; line-height: 1.8; overflow-y: auto; min-height: 0; }
     .modal-body strong { color: var(--text); }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; padding: 0 21px 21px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; padding: 0 21px 21px; flex: 0 0 auto; }
     .help-steps { display: grid; gap: 13px; margin-top: 15px; }
     .help-step { display: grid; grid-template-columns: 26px 1fr; gap: 10px; }
     .step-num { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 6px; background: var(--accent-soft); color: var(--accent); font-weight: 800; font-size: 11px; }
@@ -870,27 +870,27 @@
     };
 
     const QUESTS = [
-      { id: "steel100", name: "第一炉钢", desc: "累计生产 100 吨钢材", target: 100, value: s => s.stats.steelLifetime, reward: { cash: 300 } },
+      { id: "steel100", name: "第一炉钢", desc: "累计生产 100 吨钢材", target: 100, value: s => careerStats(s).steelLifetime, reward: { cash: 300 } },
       { id: "builder5", name: "工业雏形", desc: "拥有 5 座建筑", target: 5, value: s => totalBuildings(s), reward: { research: 60 } },
       { id: "power40", name: "能源自主", desc: "总发电能力达到 40 MW", target: 40, value: () => getRates().capacity, reward: { cash: 500 } },
-      { id: "circuit50", name: "电子时代", desc: "累计生产 50 片电路板", target: 50, value: s => s.stats.circuitsLifetime, reward: { research: 150 } },
-      { id: "craft1", name: "精工制造", desc: "完成 1 次打造", target: 1, value: s => s.stats.crafted, reward: { cash: 400 } },
-      { id: "aluminum100", name: "轻金属革命", desc: "累计生产 100 吨铝材", target: 100, value: s => s.stats.aluminumLifetime, reward: { cash: 900, research: 100 } },
-      { id: "silicon50", name: "材料提纯", desc: "累计生产 50 kg 多晶硅", target: 50, value: s => s.stats.siliconLifetime, reward: { research: 220 } },
-      { id: "robot1", name: "机器换人", desc: "打造 1 台工业机器人", target: 1, value: s => s.stats.robotsCrafted, reward: { research: 260 } },
-      { id: "battery25", name: "削峰填谷", desc: "累计生产 25 组储能电池", target: 25, value: s => s.stats.batteriesLifetime, reward: { cash: 1400 } },
-      { id: "frame10", name: "结构工程师", desc: "打造 10 件合金框架", target: 10, value: s => s.stats.framesCrafted, reward: { research: 500 } },
-      { id: "chip10", name: "中国芯", desc: "累计生产 10 枚芯片", target: 10, value: s => s.stats.chipsLifetime, reward: { cash: 2800, research: 300 } },
-      { id: "synth1", name: "技术奇点", desc: "完成 1 次核心合成", target: 1, value: s => s.stats.synthesized, reward: { cash: 1500 } },
-      { id: "contract5", name: "金牌供应商", desc: "完成 5 份贸易合约", target: 5, value: s => s.stats.contractsDone, reward: { cash: 3500 } },
+      { id: "circuit50", name: "电子时代", desc: "累计生产 50 片电路板", target: 50, value: s => careerStats(s).circuitsLifetime, reward: { research: 150 } },
+      { id: "craft1", name: "精工制造", desc: "完成 1 次打造", target: 1, value: s => careerStats(s).crafted, reward: { cash: 400 } },
+      { id: "aluminum100", name: "轻金属革命", desc: "累计生产 100 吨铝材", target: 100, value: s => careerStats(s).aluminumLifetime, reward: { cash: 900, research: 100 } },
+      { id: "silicon50", name: "材料提纯", desc: "累计生产 50 kg 多晶硅", target: 50, value: s => careerStats(s).siliconLifetime, reward: { research: 220 } },
+      { id: "robot1", name: "机器换人", desc: "打造 1 台工业机器人", target: 1, value: s => careerStats(s).robotsCrafted, reward: { research: 260 } },
+      { id: "battery25", name: "削峰填谷", desc: "累计生产 25 组储能电池", target: 25, value: s => careerStats(s).batteriesLifetime, reward: { cash: 1400 } },
+      { id: "frame10", name: "结构工程师", desc: "打造 10 件合金框架", target: 10, value: s => careerStats(s).framesCrafted, reward: { research: 500 } },
+      { id: "chip10", name: "中国芯", desc: "累计生产 10 枚芯片", target: 10, value: s => careerStats(s).chipsLifetime, reward: { cash: 2800, research: 300 } },
+      { id: "synth1", name: "技术奇点", desc: "完成 1 次核心合成", target: 1, value: s => careerStats(s).synthesized, reward: { cash: 1500 } },
+      { id: "contract5", name: "金牌供应商", desc: "完成 5 份贸易合约", target: 5, value: s => careerStats(s).contractsDone, reward: { cash: 3500 } },
       { id: "tech8", name: "技术密集型企业", desc: "研究 8 项工业科技", target: 8, value: s => Object.keys(s.tech).length, reward: { research: 1200 } },
-      { id: "quantum1", name: "量子跃迁", desc: "完成 1 枚量子单元", target: 1, value: s => s.stats.quantumCrafted, reward: { cash: 8000, research: 800 } },
+      { id: "quantum1", name: "量子跃迁", desc: "完成 1 枚量子单元", target: 1, value: s => careerStats(s).quantumCrafted, reward: { cash: 8000, research: 800 } },
       { id: "builder25", name: "工业巨擘", desc: "拥有 25 座建筑", target: 25, value: s => totalBuildings(s), reward: { research: 1200 } },
       { id: "power300", name: "能源巨头", desc: "总发电能力达到 300 MW", target: 300, value: () => getRates().capacity, reward: { cash: 12000 } },
       { id: "modules8", name: "核心收藏家", desc: "所有工业核心总等级达到 8", target: 8, value: s => Object.values(s.modules).reduce((a,b)=>a+b,0), reward: { research: 3000 } },
-      { id: "events3", name: "调度专家", desc: "处理 3 次园区调度事件", target: 3, value: s => s.stats.eventsResolved, reward: { cash: 6000, research: 500 } },
+      { id: "events3", name: "调度专家", desc: "处理 3 次园区调度事件", target: 3, value: s => careerStats(s).eventsResolved, reward: { cash: 6000, research: 500 } },
       { id: "regions3", name: "全球节点", desc: "布局 3 个产业区域", target: 3, value: s => Object.keys(s.regions).filter(id => s.regions[id]).length, reward: { research: 2500 } },
-      { id: "rareEarth1000", name: "稀土自主", desc: "累计开采 1,000 吨稀土精矿", target: 1000, value: s => s.stats.rareEarthLifetime, reward: { cash: 30000, research: 4000 } },
+      { id: "rareEarth1000", name: "稀土自主", desc: "累计开采 1,000 吨稀土精矿", target: 1000, value: s => careerStats(s).rareEarthLifetime, reward: { cash: 30000, research: 4000 } },
       { id: "builder50", name: "工业帝国", desc: "拥有 50 座建筑", target: 50, value: s => totalBuildings(s), reward: { cash: 20000, research: 2000 } },
       { id: "project1", name: "超级工程", desc: "完成 1 个超级工程", target: 1, value: s => s.projects.completed.length, reward: { cash: 50000, research: 5000 } },
       { id: "regions6", name: "无国界制造", desc: "布局全部 6 个产业区域", target: 6, value: s => Object.keys(s.regions).filter(id => s.regions[id]).length, reward: { cash: 120000 } },
@@ -900,15 +900,15 @@
       { id: "tech18", name: "技术密集", desc: "研究 18 项工业科技", target: 18, value: s => Object.keys(s.tech).length, reward: { research: 12000 } },
       { id: "staff3", name: "核心班组", desc: "三个核心席位全部就位", target: 3, value: s => s.staff.active.length, reward: { cash: 150000, research: 5000 } },
       { id: "staff8", name: "工业天团", desc: "招募全部 8 名专家", target: 8, value: s => s.staff.hired.length, reward: { cash: 800000 } },
-      { id: "superconductor500", name: "超导时代", desc: "累计生产 500 km 超导带材", target: 500, value: s => s.stats.superconductorLifetime, reward: { cash: 200000 } },
-      { id: "rareEarth10000", name: "深海矿主", desc: "累计开采 10,000 吨稀土精矿", target: 10000, value: s => s.stats.rareEarthLifetime, reward: { cash: 600000, research: 20000 } },
+      { id: "superconductor500", name: "超导时代", desc: "累计生产 500 km 超导带材", target: 500, value: s => careerStats(s).superconductorLifetime, reward: { cash: 200000 } },
+      { id: "rareEarth10000", name: "深海矿主", desc: "累计开采 10,000 吨稀土精矿", target: 10000, value: s => careerStats(s).rareEarthLifetime, reward: { cash: 600000, research: 20000 } },
       { id: "moduleTotal20", name: "核心矩阵", desc: "所有合成核心总等级达到 20", target: 20, value: s => Object.values(s.modules).reduce((a,b)=>a+b,0), reward: { research: 15000, quantum: 10 } },
       { id: "projects5", name: "文明级工业", desc: "完成全部 5 个超级工程", target: 5, value: s => s.projects.completed.length, reward: { cash: 1000000 } },
-      { id: "expedition1", name: "第一次远征", desc: "完成 1 次远征探索", target: 1, value: s => s.stats.expeditionRuns, reward: { cash: 30000 } },
-      { id: "expedition10", name: "远征老手", desc: "完成 10 次远征探索", target: 10, value: s => s.stats.expeditionRuns, reward: { research: 10000, blueprints: 3 } },
+      { id: "expedition1", name: "第一次远征", desc: "完成 1 次远征探索", target: 1, value: s => careerStats(s).expeditionRuns, reward: { cash: 30000 } },
+      { id: "expedition10", name: "远征老手", desc: "完成 10 次远征探索", target: 10, value: s => careerStats(s).expeditionRuns, reward: { research: 10000, blueprints: 3 } },
       { id: "archive10", name: "档案馆常客", desc: "归档 10 项工业成就", target: 10, value: s => s.claimedAchievements.length, reward: { research: 12000 } },
       { id: "archive30", name: "完整工业史", desc: "归档全部 30 项工业成就", target: 30, value: s => s.claimedAchievements.length, reward: { cash: 2000000, blueprints: 20 } },
-      { id: "prestige1", name: "第二曲线", desc: "完成 1 次产业重组", target: 1, value: s => s.stats.prestiges, reward: { cash: 50000 } }
+      { id: "prestige1", name: "第二曲线", desc: "完成 1 次产业重组", target: 1, value: s => careerStats(s).prestiges, reward: { cash: 50000 } }
     ];
 
     const NAV = [
@@ -1146,26 +1146,26 @@
       { id: "build10", cat: "建设", icon: "factory", name: "初具规模", desc: "拥有 10 座建筑", target: 10, value: s => totalBuildings(s), reward: { cash: 8000 } },
       { id: "build25", cat: "建设", icon: "factory", name: "工业园区", desc: "拥有 25 座建筑", target: 25, value: s => totalBuildings(s), reward: { cash: 25000 } },
       { id: "build50", cat: "建设", icon: "hq", name: "工业之城", desc: "拥有 50 座建筑", target: 50, value: s => totalBuildings(s), reward: { cash: 90000, research: 3000 } },
-      { id: "steel1000", cat: "冶金", icon: "steel", name: "千吨钢魂", desc: "累计生产 1,000 吨钢", target: 1000, value: s => s.stats.steelLifetime, reward: { research: 600 } },
-      { id: "steel100000", cat: "冶金", icon: "steel", name: "钢铁洪流", desc: "累计生产 100,000 吨钢", target: 100000, value: s => s.stats.steelLifetime, reward: { cash: 150000 } },
-      { id: "circuits1000", cat: "电子", icon: "circuits", name: "电子血脉", desc: "累计生产 1,000 片电路板", target: 1000, value: s => s.stats.circuitsLifetime, reward: { research: 1800 } },
-      { id: "chips500", cat: "电子", icon: "chip", name: "中国芯", desc: "累计生产 500 枚芯片", target: 500, value: s => s.stats.chipsLifetime, reward: { research: 4500, quantum: 3 } },
-      { id: "rare1000", cat: "边疆", icon: "rareEarth", name: "向深海要资源", desc: "累计开采 1,000 吨稀土", target: 1000, value: s => s.stats.rareEarthLifetime, reward: { cash: 60000 } },
-      { id: "rare10000", cat: "边疆", icon: "rareEarth", name: "深海矿主", desc: "累计开采 10,000 吨稀土", target: 10000, value: s => s.stats.rareEarthLifetime, reward: { cash: 600000 } },
-      { id: "super500", cat: "边疆", icon: "superconductor", name: "超导纪元", desc: "累计生产 500 km 超导带材", target: 500, value: s => s.stats.superconductorLifetime, reward: { cash: 250000, research: 12000 } },
+      { id: "steel1000", cat: "冶金", icon: "steel", name: "千吨钢魂", desc: "累计生产 1,000 吨钢", target: 1000, value: s => careerStats(s).steelLifetime, reward: { research: 600 } },
+      { id: "steel100000", cat: "冶金", icon: "steel", name: "钢铁洪流", desc: "累计生产 100,000 吨钢", target: 100000, value: s => careerStats(s).steelLifetime, reward: { cash: 150000 } },
+      { id: "circuits1000", cat: "电子", icon: "circuits", name: "电子血脉", desc: "累计生产 1,000 片电路板", target: 1000, value: s => careerStats(s).circuitsLifetime, reward: { research: 1800 } },
+      { id: "chips500", cat: "电子", icon: "chip", name: "中国芯", desc: "累计生产 500 枚芯片", target: 500, value: s => careerStats(s).chipsLifetime, reward: { research: 4500, quantum: 3 } },
+      { id: "rare1000", cat: "边疆", icon: "rareEarth", name: "向深海要资源", desc: "累计开采 1,000 吨稀土", target: 1000, value: s => careerStats(s).rareEarthLifetime, reward: { cash: 60000 } },
+      { id: "rare10000", cat: "边疆", icon: "rareEarth", name: "深海矿主", desc: "累计开采 10,000 吨稀土", target: 10000, value: s => careerStats(s).rareEarthLifetime, reward: { cash: 600000 } },
+      { id: "super500", cat: "边疆", icon: "superconductor", name: "超导纪元", desc: "累计生产 500 km 超导带材", target: 500, value: s => careerStats(s).superconductorLifetime, reward: { cash: 250000, research: 12000 } },
       { id: "tech5", cat: "科技", icon: "tech", name: "技术立厂", desc: "研究 5 项科技", target: 5, value: s => Object.keys(s.tech).length, reward: { research: 1500 } },
       { id: "tech12", cat: "科技", icon: "tech", name: "研发密集", desc: "研究 12 项科技", target: 12, value: s => Object.keys(s.tech).length, reward: { research: 7000 } },
       { id: "tech20", cat: "科技", icon: "quantum", name: "技术奇点", desc: "完成全部 20 项科技", target: 20, value: s => Object.keys(s.tech).length, reward: { research: 25000, quantum: 8 } },
       { id: "modules8", cat: "合成", icon: "synth", name: "核心矩阵", desc: "所有核心总等级达到 8", target: 8, value: s => Object.values(s.modules).reduce((a,b)=>a+b,0), reward: { research: 3500 } },
       { id: "modules20", cat: "合成", icon: "quantum", name: "核心过载", desc: "所有核心总等级达到 20", target: 20, value: s => Object.values(s.modules).reduce((a,b)=>a+b,0), reward: { research: 14000 } },
-      { id: "prestige1", cat: "传承", icon: "reset", name: "第二曲线", desc: "完成 1 次产业重组", target: 1, value: s => s.stats.prestiges, reward: { cash: 50000 } },
-      { id: "prestige3", cat: "传承", icon: "blueprint", name: "轮回工业", desc: "完成 3 次产业重组", target: 3, value: s => s.stats.prestiges, reward: { cash: 250000 } },
+      { id: "prestige1", cat: "传承", icon: "reset", name: "第二曲线", desc: "完成 1 次产业重组", target: 1, value: s => careerStats(s).prestiges, reward: { cash: 50000 } },
+      { id: "prestige3", cat: "传承", icon: "blueprint", name: "轮回工业", desc: "完成 3 次产业重组", target: 3, value: s => careerStats(s).prestiges, reward: { cash: 250000 } },
       { id: "regions3", cat: "全球", icon: "globe", name: "全球节点", desc: "布局 3 个产业区域", target: 3, value: s => Object.keys(s.regions).filter(id => s.regions[id]).length, reward: { research: 6000 } },
       { id: "regions6", cat: "全球", icon: "globe", name: "无国界制造", desc: "布局全部 6 个区域", target: 6, value: s => Object.keys(s.regions).filter(id => s.regions[id]).length, reward: { cash: 350000 } },
-      { id: "contracts10", cat: "商业", icon: "contract", name: "可靠供应商", desc: "交付 10 份贸易合约", target: 10, value: s => s.stats.contractsDone, reward: { cash: 35000 } },
-      { id: "contracts40", cat: "商业", icon: "cash", name: "商业帝国", desc: "交付 40 份贸易合约", target: 40, value: s => s.stats.contractsDone, reward: { cash: 250000, research: 8000 } },
-      { id: "events5", cat: "管理", icon: "spark", name: "临场调度", desc: "处理 5 次园区事件", target: 5, value: s => s.stats.eventsResolved, reward: { research: 3000 } },
-      { id: "events20", cat: "管理", icon: "policy", name: "危机管理者", desc: "处理 20 次园区事件", target: 20, value: s => s.stats.eventsResolved, reward: { cash: 150000 } },
+      { id: "contracts10", cat: "商业", icon: "contract", name: "可靠供应商", desc: "交付 10 份贸易合约", target: 10, value: s => careerStats(s).contractsDone, reward: { cash: 35000 } },
+      { id: "contracts40", cat: "商业", icon: "cash", name: "商业帝国", desc: "交付 40 份贸易合约", target: 40, value: s => careerStats(s).contractsDone, reward: { cash: 250000, research: 8000 } },
+      { id: "events5", cat: "管理", icon: "spark", name: "临场调度", desc: "处理 5 次园区事件", target: 5, value: s => careerStats(s).eventsResolved, reward: { research: 3000 } },
+      { id: "events20", cat: "管理", icon: "policy", name: "危机管理者", desc: "处理 20 次园区事件", target: 20, value: s => careerStats(s).eventsResolved, reward: { cash: 150000 } },
       { id: "staff3", cat: "团队", icon: "users", name: "核心班组", desc: "三个核心席位全部就位", target: 3, value: s => s.staff.active.length, reward: { cash: 60000 } },
       { id: "staff8", cat: "团队", icon: "users", name: "工业天团", desc: "招募全部 8 名专家", target: 8, value: s => s.staff.hired.length, reward: { cash: 600000 } },
       { id: "project1", cat: "工程", icon: "project", name: "超级工程", desc: "完成 1 个超级工程", target: 1, value: s => s.projects.completed.length, reward: { research: 6000 } },
@@ -1214,7 +1214,7 @@
           deepsea: 0, superconductor: 0, turbine: 0, circularHub: 0, darkCluster: 0
         },
         tech: {}, modules: { automation: 0, grid: 0, nano: 0, material: 0, ai: 0, quantum: 0, geo: 0, will: 0 }, queue: [], claimed: [],
-        route: null, staff: { hired: [], active: [] }, claimedAchievements: [],
+        route: null, staff: { hired: [], active: [] }, claimedAchievements: [], career: {},
         legacy: { startup: 0, heritage: 0, grid: 0, craft: 0, market: 0, knowledge: 0 },
         iterations: { output: 0, power: 0, material: 0, research: 0, craft: 0, trade: 0 },
         projects: { completed: [], active: null }, expedition: { active: null },
@@ -1222,7 +1222,7 @@
         buffs: {}, currentEvent: null, nextEventAt: 0, lastEvent: "",
         stats: {
           steelLifetime: 0, aluminumLifetime: 0, siliconLifetime: 0, circuitsLifetime: 0, batteriesLifetime: 0, chipsLifetime: 0,
-          rareEarthLifetime: 0, superconductorLifetime: 0,
+          robotsLifetime: 0, quantumLifetime: 0, rareEarthLifetime: 0, superconductorLifetime: 0,
           crafted: 0, framesCrafted: 0, controlsCrafted: 0, robotsCrafted: 0, quantumCrafted: 0,
           synthesized: 0, contractsDone: 0, eventsResolved: 0, expeditionRuns: 0, expeditionSuccess: 0, expeditionPartial: 0, expeditionFail: 0, prestiges: 0, playtime: 0
         },
@@ -1240,12 +1240,24 @@
         merged.buildings = { ...fresh.buildings, ...(saved.buildings || {}) };
         merged.modules = { ...fresh.modules, ...(saved.modules || {}) };
         merged.stats = { ...fresh.stats, ...(saved.stats || {}) };
+        merged.career = saved.career && typeof saved.career === "object" ? { ...saved.career } : {};
+        Object.keys(merged.stats).forEach(key => {
+          const value = Number(merged.stats[key]);
+          merged.stats[key] = Number.isFinite(value) && value >= 0 ? value : fresh.stats[key];
+        });
+        Object.keys(merged.career).forEach(key => {
+          if (!Object.prototype.hasOwnProperty.call(fresh.stats, key)) { delete merged.career[key]; return; }
+          const value = Number(merged.career[key]);
+          if (!Number.isFinite(value) || value < 0) delete merged.career[key];
+          else merged.career[key] = value;
+        });
         merged.legacy = { ...fresh.legacy, ...(saved.legacy || {}) };
         merged.regions = { ...fresh.regions, ...(saved.regions || {}) };
         merged.auto = { ...fresh.auto, ...(saved.auto || {}) };
         merged.iterations = { ...fresh.iterations, ...(saved.iterations || {}) };
         merged.projects = { completed: [], active: null, ...(saved.projects || {}) };
-        merged.projects.completed = Array.isArray(merged.projects.completed) ? merged.projects.completed.filter(id => PROJECTS[id]) : [];
+        merged.projects.completed = Array.isArray(merged.projects.completed) ? [...new Set(merged.projects.completed.filter(id => PROJECTS[id]))] : [];
+        if (merged.projects.active && merged.projects.completed.includes(merged.projects.active.id)) merged.projects.active = null;
         if (merged.projects.active && (!PROJECTS[merged.projects.active.id] || !Number.isFinite(Number(merged.projects.active.endsAt)))) merged.projects.active = null;
         merged.expedition = { active: null, ...(saved.expedition || {}) };
         if (merged.expedition.active) {
@@ -1266,21 +1278,29 @@
         merged.staff = { hired: [], active: [], ...(saved.staff || {}) };
         merged.staff.hired = [...new Set(Array.isArray(merged.staff.hired) ? merged.staff.hired.filter(id => STAFF[id]) : [])];
         merged.staff.active = [...new Set(Array.isArray(merged.staff.active) ? merged.staff.active.filter(id => STAFF[id] && merged.staff.hired.includes(id)) : [])].slice(0, 3);
+        if (merged.expedition.active) {
+          merged.expedition.active.team = merged.expedition.active.team.filter(id => merged.staff.hired.includes(id));
+          merged.staff.active = merged.staff.active.filter(id => !merged.expedition.active.team.includes(id));
+        }
         merged.claimedAchievements = [...new Set(Array.isArray(saved.claimedAchievements) ? saved.claimedAchievements.filter(id => ACHIEVEMENTS.some(a => a.id === id)) : [])];
         if (Array.isArray(saved.log)) {
-          merged.log = saved.log.filter(l => l && l.text).slice(0, 200).map((l, i) => ({
-            id: typeof l.id === "string" ? l.id : "legacy-" + (Number(l.time) || i) + "-" + i,
-            time: Number(l.time) || Date.now(),
-            text: String(l.text),
-            kind: LOG_KINDS[l.kind] ? l.kind : "system",
-            important: !!l.important,
-            read: l.important ? l.read !== false : true
-          }));
+          merged.log = saved.log.filter(l => l && l.text).slice(0, 200).map((l, i) => {
+            const inferred = inferLogMeta(l.text);
+            const important = typeof l.important === "boolean" ? l.important : inferred.important;
+            return {
+              id: typeof l.id === "string" ? l.id : "legacy-" + (Number(l.time) || i) + "-" + i,
+              time: Number(l.time) || Date.now(),
+              text: String(l.text),
+              kind: LOG_KINDS[l.kind] ? l.kind : inferred.kind,
+              important,
+              read: typeof l.read === "boolean" ? l.read : !important
+            };
+          });
         }
         if (!RECIPES[merged.auto.craft]) merged.auto.craft = "";
         merged.tech = saved.tech || {};
-        merged.queue = Array.isArray(saved.queue) ? saved.queue.filter(q => RECIPES[q.id]) : [];
-        merged.claimed = Array.isArray(saved.claimed) ? saved.claimed : [];
+        merged.queue = Array.isArray(saved.queue) ? saved.queue.filter(q => q && typeof q === "object" && RECIPES[q.id] && Number(q.remaining) > 0 && Number(q.total) >= Number(q.remaining)) : [];
+        merged.claimed = Array.isArray(saved.claimed) ? [...new Set(saved.claimed.filter(id => QUESTS.some(q => q.id === id)))] : [];
         merged.contracts = Array.isArray(saved.contracts) ? saved.contracts.slice(0, 3) : [];
         const POLICIES = ["balanced","shifts","maintenance","rnd","market"];
         if (!POLICIES.includes(merged.policy)) merged.policy = "balanced";
@@ -1288,6 +1308,8 @@
           if (!Number.isFinite(Number(merged[k])) || Number(merged[k]) < 0) merged[k] = fresh[k];
           else merged[k] = Number(merged[k]);
         });
+        const saveTime = Number(merged.lastSave);
+        merged.lastSave = Number.isFinite(saveTime) && saveTime > 0 && saveTime <= Date.now() + 60000 ? saveTime : Date.now();
         merged.version = VERSION;
         return merged;
       } catch (e) { return fresh; }
@@ -1299,18 +1321,23 @@
     let lastSave = Date.now();
     let offlineReport = null;
     let renderedTab = null;
-    let renderedSignature = null;
     let pointerHeld = false;
     let pointerDownAt = 0;
     let interactionUntil = 0;
     let notificationOpen = false;
+    let lastNoticeHTML = "";
     let logFilter = "all";
     let expeditionDraft = [];
 
     function totalBuildings(s = state) { return Object.values(s.buildings).reduce((a,b) => a + Number(b || 0), 0); }
+    function careerStats(s = state) {
+      const result = { ...(s.stats || {}) };
+      if (s.career) Object.keys(s.career).forEach(key => { result[key] = (s.stats?.[key] || 0) + (s.career[key] || 0); });
+      return result;
+    }
     function hasTech(id) { return !!state.tech[id]; }
-    const PRODUCTION_KEYS = ["cash","steel","aluminum","silicon","circuits","batteries","research","chips","quantum","rareEarth","superconductor"];
-    const LIFETIME_KEYS = { steel: "steelLifetime", aluminum: "aluminumLifetime", silicon: "siliconLifetime", circuits: "circuitsLifetime", batteries: "batteriesLifetime", chips: "chipsLifetime", rareEarth: "rareEarthLifetime", superconductor: "superconductorLifetime" };
+    const PRODUCTION_KEYS = ["cash","steel","aluminum","silicon","circuits","batteries","research","chips","robots","quantum","rareEarth","superconductor"];
+    const LIFETIME_KEYS = { steel: "steelLifetime", aluminum: "aluminumLifetime", silicon: "siliconLifetime", circuits: "circuitsLifetime", batteries: "batteriesLifetime", chips: "chipsLifetime", robots: "robotsLifetime", quantum: "quantumLifetime", rareEarth: "rareEarthLifetime", superconductor: "superconductorLifetime" };
     function recordProduction(res, amount) {
       const key = LIFETIME_KEYS[res];
       if (key) state.stats[key] += amount;
@@ -1319,14 +1346,14 @@
     function regionBonus(type) {
       return ownedRegions().reduce((sum,[,r]) => sum + (r.effects[type] || 0), 0);
     }
-    function buffMult(type) {
+    function buffMult(type, atTime = Date.now()) {
       const b = state.buffs[type];
-      if (!b || b.expires <= Date.now()) return 1;
+      if (!b || b.expires <= atTime) return 1;
       return b.mult || 1;
     }
     function projectComplete(id) { return state.projects.completed.includes(id); }
     function projectBonus(type) {
-      return state.projects.completed.reduce((sum, id) => sum + ((PROJECTS[id]?.effects?.[type]) || 0), 0);
+      return [...new Set(state.projects.completed)].reduce((sum, id) => sum + ((PROJECTS[id]?.effects?.[type]) || 0), 0);
     }
     function iterationBonus(type) { return (state.iterations[type] || 0) * ITERATIONS[type].step; }
     function routeEffect(type) { return state.route && ROUTES[state.route] ? (ROUTES[state.route].effects[type] || 0) : 0; }
@@ -1340,7 +1367,7 @@
       if (type === "research") return count >= 20 ? .15 : 0;
       return 0;
     }
-    function getRates() {
+    function getRates(atTime = Date.now()) {
       const policy = POLICIES[state.policy] || POLICIES.balanced;
       let capacity = 0, demand = 0;
       Object.entries(BUILDINGS).forEach(([id,b]) => {
@@ -1350,21 +1377,21 @@
         demand += (b.powerUse || 0) * n * deepseaDiscount;
       });
       capacity *= (1 + state.modules.grid * .15) * (hasTech("smartGrid") ? 1.25 : 1) * (hasTech("superconductingGrid") ? 1.5 : 1) * (1 + state.legacy.grid * .1)
-        * (1 + regionBonus("power")) * (1 + projectBonus("power")) * (1 + iterationBonus("power")) * (1 + staffBonus("power")) * (1 + archiveBonus("power")) * buffMult("power");
+        * (1 + regionBonus("power")) * (1 + projectBonus("power")) * (1 + iterationBonus("power")) * (1 + staffBonus("power")) * (1 + archiveBonus("power")) * buffMult("power", atTime);
       demand *= policy.power * (hasTech("energyStorage") ? .9 : 1) * (hasTech("circularEconomy") ? .85 : 1) * (1 + routeEffect("powerDemand"));
       const efficiency = demand > 0 ? Math.min(1, capacity / demand) : 1;
       const mult = (1 + state.modules.automation * .2) * (1 + state.modules.quantum * .3) * (1 + state.modules.will * .4)
         * (hasTech("automation") ? 1.5 : 1) * (hasTech("orbital") ? 1.5 : 1)
         * (hasTech("orbitalLogistics") ? 1.5 : 1) * (hasTech("matterPrinting") ? 1.25 : 1)
         * (1 + state.legacy.heritage * .12) * (1 + regionBonus("all")) * (1 + projectBonus("all"))
-        * (1 + iterationBonus("output")) * (1 + routeEffect("output")) * (1 + staffBonus("all")) * (1 + archiveBonus("all")) * buffMult("production") * policy.output;
+        * (1 + iterationBonus("output")) * (1 + routeEffect("output")) * (1 + staffBonus("all")) * (1 + archiveBonus("all")) * buffMult("production", atTime);
       const rates = {};
       PRODUCTION_KEYS.forEach(r => { rates[r] = 0; });
       Object.entries(BUILDINGS).forEach(([id,b]) => {
         const n = state.buildings[id] || 0;
         Object.entries(b.produces).forEach(([r,v]) => { rates[r] = (rates[r] || 0) + v * n; });
       });
-      Object.keys(rates).forEach(r => { rates[r] *= efficiency * mult; });
+      Object.keys(rates).forEach(r => { rates[r] *= efficiency * mult * (r === "cash" || r === "research" ? 1 : policy.output); });
       const iterationMaterial = 1 + iterationBonus("material");
       const staffMaterial = 1 + staffBonus("material");
       const materialMult = (hasTech("lean") ? 1.35 : 1) * (hasTech("advancedMaterials") ? 1.4 : 1) * (1 + state.modules.material * .25) * iterationMaterial * (1 + routeEffect("material")) * staffMaterial;
@@ -1375,11 +1402,11 @@
       rates.rareEarth *= frontierMult;
       rates.superconductor *= frontierMult;
       rates.research *= policy.research * (1 + state.legacy.knowledge * .15) * (1 + state.modules.ai * .25) * (hasTech("semiconductors") ? 1.2 : 1) * (hasTech("quantum") ? 1.5 : 1) * (hasTech("agvSwarm") ? 1.4 : 1)
-        * (1 + regionBonus("research")) * (1 + iterationBonus("research")) * (1 + routeEffect("research")) * (1 + staffBonus("research")) * (1 + archiveBonus("research")) * buffMult("research");
-      rates.cash *= policy.cash * (1 + regionBonus("cash")) * (1 + routeEffect("cash")) * (1 + staffBonus("cash")) * buffMult("cash");
+        * (1 + regionBonus("research")) * (1 + iterationBonus("research")) * (1 + routeEffect("research")) * (1 + staffBonus("research")) * (1 + archiveBonus("research")) * buffMult("research", atTime);
+      rates.cash *= policy.cash * (1 + regionBonus("cash")) * (1 + routeEffect("cash")) * (1 + staffBonus("cash")) * buffMult("cash", atTime);
       return { ...rates, capacity, demand, efficiency, mult };
     }
-    function craftSpeed() { return (1 + state.modules.nano * .25) * (hasTech("digitalTwin") ? 1.4 : 1) * (hasTech("agvSwarm") ? 1.25 : 1) * (1 + state.legacy.craft * .12) * (1 + regionBonus("craft")) * (1 + iterationBonus("craft")) * (1 + routeEffect("craft")) * (1 + staffBonus("craft")) * buffMult("craft"); }
+    function craftSpeed(atTime = Date.now()) { return (1 + state.modules.nano * .25) * (hasTech("digitalTwin") ? 1.4 : 1) * (hasTech("agvSwarm") ? 1.25 : 1) * (1 + state.legacy.craft * .12) * (1 + regionBonus("craft")) * (1 + iterationBonus("craft")) * (1 + routeEffect("craft")) * (1 + staffBonus("craft")) * buffMult("craft", atTime); }
     function moduleEffect(id, level) {
       const names = { automation: "全建筑产出", grid: "总发电能力", nano: "打造速度", material: "钢材、铝材、硅料产出", ai: "研究点产出", quantum: "全建筑产出", geo: "稀土、超导产出", will: "全建筑产出" };
       return names[id] + " +" + Math.round(level * MODULES[id].step * 100) + "%";
@@ -1407,6 +1434,9 @@
     function grant(reward) { Object.entries(reward).forEach(([r,v]) => { state[r] = (state[r] || 0) + v; }); }
     function costHTML(cost) {
       return Object.entries(cost).map(([r,v]) => '<span class="cost ' + ((state[r] || 0) < v ? "lack" : "") + '">' + icon(RES[r].icon) + fmt(v) + " " + RES[r].name + "</span>").join("");
+    }
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
     }
     function fmt(n) {
       n = Number(n) || 0;
@@ -1489,13 +1519,13 @@
       }
     }
 
-    function queueCraft(id) {
+    function queueCraft(id, fromTick = false) {
       const r = RECIPES[id];
       if (!r || (r.tech && !hasTech(r.tech)) || state.queue.length >= 8 || !canAfford(r.cost)) return;
       pay(r.cost);
       state.queue.push({ uid: Date.now() + Math.random(), id, remaining: r.time, total: r.time });
       addLog(r.name + " 已加入打造队列。");
-      render();
+      if (fromTick) renderFromTick(); else render();
     }
     function cancelCraft(uid) {
       const i = state.queue.findIndex(q => String(q.uid) === String(uid));
@@ -1550,13 +1580,12 @@
     }
 
     function contractUnlocked(item) {
-      const lifetime = { aluminum: "aluminumLifetime", circuits: "circuitsLifetime", batteries: "batteriesLifetime", chips: "chipsLifetime", rareEarth: "rareEarthLifetime", superconductor: "superconductorLifetime" };
+      const lifetime = { aluminum: "aluminumLifetime", circuits: "circuitsLifetime", batteries: "batteriesLifetime", chips: "chipsLifetime", robots: "robotsLifetime", quantum: "quantumLifetime", rareEarth: "rareEarthLifetime", superconductor: "superconductorLifetime" };
+      const stats = careerStats();
       if (item.res === "steel") return true;
-      if (lifetime[item.res]) return (state.stats[lifetime[item.res]] || 0) > 0;
-      if (item.res === "frames") return state.stats.framesCrafted > 0;
-      if (item.res === "controls") return state.stats.controlsCrafted > 0;
-      if (item.res === "robots") return state.stats.robotsCrafted > 0;
-      if (item.res === "quantum") return state.stats.quantumCrafted > 0;
+      if (lifetime[item.res]) return (stats[lifetime[item.res]] || 0) > 0;
+      if (item.res === "frames") return stats.framesCrafted > 0;
+      if (item.res === "controls") return stats.controlsCrafted > 0;
       return false;
     }
     function contractTitle(need) {
@@ -1749,7 +1778,7 @@
         const id = state.auto.craft, recipe = RECIPES[id], target = AUTO_TARGETS[id] || 1;
         const queued = state.queue.filter(q => q.id === id).length;
         if (recipe && (!recipe.tech || hasTech(recipe.tech)) && state.queue.length < 2 && state[recipe.output] < target && queued < 1 && canAfford(recipe.cost)) {
-          queueCraft(id);
+          queueCraft(id, true);
         }
       }
       ensureEvent();
@@ -1852,7 +1881,7 @@
       return true;
     }
     function checkExpedition() {
-      if (resolveExpedition()) render();
+      if (resolveExpedition()) renderFromTick();
     }
     function startProject(id) {
       const project = PROJECTS[id];
@@ -1863,15 +1892,16 @@
       addLog("超级工程启动：" + project.name + "，预计 " + timeText(project.duration) + " 后完工。");
       toast(project.name + " 已开工", true); render();
     }
-    function checkProjects() {
+    function checkProjects(atTime = Date.now(), silent = false) {
       const active = state.projects.active;
-      if (!active || Date.now() < active.endsAt) return;
+      if (!active || atTime < active.endsAt) return false;
       const project = PROJECTS[active.id];
-      if (!project || projectComplete(active.id)) { state.projects.active = null; return; }
+      if (!project || projectComplete(active.id)) { state.projects.active = null; return false; }
       state.projects.completed.push(active.id);
       state.projects.active = null;
       addLog("超级工程完工：" + project.name + "，集团获得永久产能增益。");
-      toast("超级工程完工：" + project.name, true);
+      if (!silent) toast("超级工程完工：" + project.name, true);
+      return true;
     }
     function doPrestige() {
       const gain = prestigeGain();
@@ -1884,10 +1914,16 @@
         expedition: { active: state.expedition.active ? { ...state.expedition.active, team: [...state.expedition.active.team] } : null },
         staff: { hired: [...state.staff.hired], active: [...state.staff.active] },
         claimedAchievements: [...state.claimedAchievements],
+        claimed: [...state.claimed],
+        career: { ...state.career },
         log: state.log.slice(0, 199).map(entry => ({ ...entry })),
         prestiges: state.stats.prestiges + 1,
         playtime: state.stats.playtime
       };
+      Object.entries(state.stats).forEach(([key, value]) => {
+        if (key === "prestiges" || key === "playtime") return;
+        carried.career[key] = (carried.career[key] || 0) + Number(value || 0);
+      });
       state = newState();
       state.blueprints = carried.blueprints;
       state.legacy = carried.legacy;
@@ -1896,6 +1932,8 @@
       state.expedition = carried.expedition;
       state.staff = carried.staff;
       state.claimedAchievements = carried.claimedAchievements;
+      state.claimed = carried.claimed;
+      state.career = carried.career;
       state.stats.prestiges = carried.prestiges;
       state.stats.playtime = carried.playtime;
       state.cash += state.legacy.startup * 2000;
@@ -2001,7 +2039,7 @@
     function chainRow(ic, name, rate, value) { return '<div class="chain-row"><div class="chain-icon">' + icon(ic) + '</div><div><div class="chain-name">' + name + '</div><div class="chain-rate">' + rate + '</div></div><div class="chain-value mono">' + value + '</div></div>'; }
     function logHTML(limit = 20) {
       if (!state.log.length) return '<div class="empty">暂无生产动态</div>';
-      return '<div class="log-list">' + state.log.slice(0,limit).map(l => '<div class="log-item"><span class="log-time mono">' + new Date(l.time).toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"}) + '</span><span class="log-text">' + l.text + '</span></div>').join("") + '</div>';
+      return '<div class="log-list">' + state.log.slice(0,limit).map(l => '<div class="log-item"><span class="log-time mono">' + new Date(l.time).toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"}) + '</span><span class="log-text">' + escapeHTML(l.text) + '</span></div>').join("") + '</div>';
     }
     function factorySVG() {
       return '<svg class="factory-art" viewBox="0 0 600 310" fill="none" aria-hidden="true"><defs><linearGradient id="fac" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3c464b"/><stop offset="1" stop-color="#252d32"/></linearGradient><linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e9a343" stop-opacity=".75"/><stop offset="1" stop-color="#e9a343" stop-opacity=".12"/></linearGradient></defs><path d="M30 278h550" stroke="#495157"/><path d="m55 278 120-38 365 28-112 34-373-24Z" fill="#1a2024"/><path d="M180 267V151l106 45V123l114 48v96H180Z" fill="url(#fac)" stroke="#525c61"/><path d="M400 267V176l99-37v128H400Z" fill="#2a3237" stroke="#525c61"/><path d="M415 119h28v111h-28z" fill="#333c41" stroke="#5a6367"/><path d="M410 119h38v10h-38z" fill="#e59b3d"/><path d="M465 93h23v145h-23z" fill="#333c41" stroke="#5a6367"/><path d="M461 93h31v9h-31z" fill="#e59b3d"/><g class="smoke"><path d="M420 105c-17-17 11-20 1-38 22 11 20 25 5 38h-6Z" fill="#c3cbd0" opacity=".25"/></g><g class="smoke two"><path d="M469 80c-14-18 12-24 2-44 23 13 20 28 4 44h-6Z" fill="#c3cbd0" opacity=".22"/></g><path d="m202 184 58 24v36l-58-23v-37Z" fill="url(#glass)"/><path d="m307 188 64 26v31l-64-25v-32Z" fill="url(#glass)"/><path d="M286 232v35m0-35 114 1m-114 16h114" stroke="#596268"/><path d="M200 258h180" stroke="#e7a144" stroke-width="3" stroke-dasharray="12 16" class="belt"/><g fill="#e9a343"><path d="m418 186 15-6v14l-15 6v-14Zm27-10 15-6v14l-15 6v-14Zm27-10 15-6v14l-15 6v-14Z" opacity=".7"/></g><path d="M94 260v-64h10v64m-22-64h34M88 209h22" stroke="#596268" stroke-width="3"/><path d="m87 196 22-32 22 32H87Z" fill="#343d42" stroke="#596268"/></svg>';
@@ -2097,7 +2135,7 @@
           lastDay = day;
         }
         const meta = LOG_KINDS[entry.kind] || LOG_KINDS.system;
-        return dateHead + '<div class="log-entry"><span class="log-entry-time mono">' + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0") + '</span><span class="log-kind">' + icon(meta.icon) + meta.name + '</span><span class="log-entry-text">' + entry.text + '</span></div>';
+        return dateHead + '<div class="log-entry"><span class="log-entry-time mono">' + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0") + '</span><span class="log-kind">' + icon(meta.icon) + meta.name + '</span><span class="log-entry-text">' + escapeHTML(entry.text) + '</span></div>';
       }).join("");
       return pageHead("OPERATIONS LOG", "运营日志", "完整记录园区建设、科研、工程、商业、团队与调度决策。重要事件会同步进入右上角通知中心。", '<button class="btn small ghost" data-action="export-logs">' + icon("save") + '导出日志</button><button class="btn small ghost" data-action="clear-logs">' + icon("reset") + '清空</button>') +
         '<div class="log-summary"><div class="log-summary-card"><strong class="mono">' + state.log.length + '</strong><span>日志总条数</span></div><div class="log-summary-card"><strong class="mono">' + todayCount + '</strong><span>今日新增</span></div><div class="log-summary-card"><strong class="mono ' + (unread ? "accent" : "green") + '">' + unread + '</strong><span>未读通知</span></div></div>' +
@@ -2316,28 +2354,55 @@
       }
       morphChildren(current, incoming);
     }
+    function morphKey(node) {
+      if (node.nodeType !== 1) return "node-" + node.nodeType;
+      if (node.id) return "id-" + node.id;
+      const key = node.getAttribute("data-key");
+      if (key) return "key-" + key;
+      return node.nodeName + "." + String(node.className);
+    }
     function morphChildren(parent, incomingParent) {
       const currentChildren = Array.from(parent.childNodes);
       const newChildren = Array.from(incomingParent.childNodes);
+      const buckets = new Map();
+      currentChildren.forEach(child => {
+        const key = morphKey(child);
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(child);
+      });
+      const used = new Set();
       for (let i = 0; i < newChildren.length; i++) {
-        if (!currentChildren[i]) parent.appendChild(document.importNode(newChildren[i], true));
-        else morphNode(currentChildren[i], newChildren[i]);
+        const incoming = newChildren[i];
+        const key = morphKey(incoming);
+        let candidate = currentChildren[i];
+        if (!candidate || used.has(candidate) || morphKey(candidate) !== key) {
+          const bucket = buckets.get(key) || [];
+          candidate = bucket.find(child => !used.has(child));
+        }
+        if (candidate) {
+          used.add(candidate);
+          if (parent.childNodes[i] !== candidate) parent.insertBefore(candidate, parent.childNodes[i] || null);
+          morphNode(candidate, incoming);
+        } else {
+          parent.insertBefore(document.importNode(incoming, true), parent.childNodes[i] || null);
+        }
       }
-      for (let i = currentChildren.length - 1; i >= newChildren.length; i--) {
-        if (parent.childNodes[i]) parent.removeChild(parent.childNodes[i]);
-      }
+      currentChildren.forEach(child => {
+        if (!used.has(child) && child.parentNode === parent) child.remove();
+      });
     }
-    function patchContent(container, html, tab) {
+    function patchElement(container, html) {
       const template = document.createElement("template");
       template.innerHTML = html;
-      const signature = Array.from(template.content.children).map(el => el.tagName + "." + String(el.className) + "#" + (el.getAttribute("data-key") || "")).join("|");
-      if (renderedTab !== tab || renderedSignature !== signature || !container.firstChild) {
+      morphChildren(container, template.content);
+    }
+    function patchContent(container, html, tab) {
+      if (renderedTab !== tab || !container.firstChild) {
         container.innerHTML = html;
         renderedTab = tab;
-        renderedSignature = signature;
         return;
       }
-      morphChildren(container, template.content);
+      patchElement(container, html);
     }
 
     function notificationEntries() { return state.log.filter(entry => entry.important); }
@@ -2360,14 +2425,19 @@
       document.getElementById("notify-btn").title = unread ? "通知中心 · " + unread + " 条未读" : "通知中心";
       if (!notificationOpen) {
         panel.hidden = true;
-        panel.innerHTML = "";
+        if (panel.innerHTML) panel.innerHTML = "";
+        lastNoticeHTML = "";
         return;
       }
       const items = notificationEntries().slice(0, 7);
       panel.hidden = false;
-      panel.innerHTML = '<div class="notify-head"><div><span class="notify-title">通知中心</span><span class="notify-count">' + (unread ? unread + " 条未读" : "全部已读") + '</span></div><button class="btn small ghost" data-action="mark-all-read" ' + (unread ? "" : "disabled") + '>全部已读</button></div><div class="notify-list">' +
-        (items.length ? items.map(entry => '<div class="notice-item ' + (entry.read ? "" : "unread") + '" data-action="read-notice" data-id="' + entry.id + '"><div class="notice-icon">' + icon((LOG_KINDS[entry.kind] || LOG_KINDS.system).icon) + '</div><div class="notice-main"><div class="notice-text">' + entry.text + '</div><div class="notice-time">' + (LOG_KINDS[entry.kind] || LOG_KINDS.system).name + ' · ' + relativeTime(entry.time) + '</div></div><span class="notice-dot ' + (entry.read ? "hidden" : "") + '"></span></div>').join("") : '<div class="log-empty">暂无重要通知</div>') +
+      const html = '<div class="notify-head"><div><span class="notify-title">通知中心</span><span class="notify-count">' + (unread ? unread + " 条未读" : "全部已读") + '</span></div><button class="btn small ghost" data-action="mark-all-read" ' + (unread ? "" : "disabled") + '>全部已读</button></div><div class="notify-list">' +
+        (items.length ? items.map(entry => '<div class="notice-item ' + (entry.read ? "" : "unread") + '" data-action="read-notice" data-id="' + escapeHTML(entry.id) + '"><div class="notice-icon">' + icon((LOG_KINDS[entry.kind] || LOG_KINDS.system).icon) + '</div><div class="notice-main"><div class="notice-text">' + escapeHTML(entry.text) + '</div><div class="notice-time">' + (LOG_KINDS[entry.kind] || LOG_KINDS.system).name + ' · ' + relativeTime(entry.time) + '</div></div><span class="notice-dot ' + (entry.read ? "hidden" : "") + '"></span></div>').join("") : '<div class="log-empty">暂无重要通知</div>') +
         '</div><div class="notify-foot"><button class="btn small ghost" data-action="nav" data-id="logs">查看全部日志</button></div>';
+      if (lastNoticeHTML !== html) {
+        patchElement(panel, html);
+        lastNoticeHTML = html;
+      }
     }
     function toggleNotifications() {
       notificationOpen = !notificationOpen;
@@ -2417,6 +2487,10 @@
       toast("日志与通知已清空", true);
     }
 
+    function renderFromTick() {
+      if (pointerHeld || Date.now() < interactionUntil) return;
+      render();
+    }
     function render() {
       const r = getRates(), rank = rankInfo();
       const powerPct = Math.round(r.efficiency * 100);
@@ -2430,7 +2504,8 @@
       const xp = rank.next === prev ? 100 : Math.min(100,(industrialIndex()-prev)/(rank.next-prev)*100);
       document.getElementById("site-card").innerHTML = '<div class="site-eyebrow">SITE 001 / ONLINE</div><div class="site-name">北辰工业园</div><div class="site-level"><span>' + rank.name + '</span><span class="mono">LV.' + rank.level + '</span></div><div class="xp-track"><div class="xp-fill" style="width:' + xp + '%"></div></div>';
       const claimable = QUESTS.filter(q => !state.claimed.includes(q.id) && q.value(state) >= q.target).length;
-      document.getElementById("nav").innerHTML = NAV.map(([id,name,ic]) => '<button class="nav-btn ' + (state.tab===id?"active":"") + '" data-action="nav" data-id="' + id + '">' + icon(ic) + name + (id==="milestones" && claimable ? '<span class="nav-badge">' + claimable + '</span>' : "") + '</button>').join("");
+      const navHTML = NAV.map(([id,name,ic]) => '<button class="nav-btn ' + (state.tab===id?"active":"") + '" data-action="nav" data-id="' + id + '">' + icon(ic) + name + (id==="milestones" && claimable ? '<span class="nav-badge">' + claimable + '</span>' : "") + '</button>').join("");
+      patchElement(document.getElementById("nav"), navHTML);
       const views = { overview: renderOverview, buildings: renderBuildings, crafting: renderCrafting, synthesis: renderSynthesis, contracts: renderContracts, regions: renderRegions, projects: renderProjects, expeditions: renderExpeditions, research: renderResearch, milestones: renderMilestones, archive: renderArchive, headquarters: renderHeadquarters, team: renderTeam, logs: renderLogs };
       patchContent(document.getElementById("content"), (views[state.tab] || renderOverview)(), state.tab);
       renderNotificationUI();
@@ -2504,17 +2579,58 @@
     document.getElementById("reset-btn").innerHTML = icon("reset");
     document.getElementById("notify-btn").innerHTML = icon("bell");
 
-    function applyOffline() {
-      const elapsed = Math.max(0,(Date.now() - Number(state.lastSave || Date.now()))/1000);
-      if (elapsed < 120) return;
-      const seconds = Math.min(elapsed, 8*3600), effective = seconds * .5, r = getRates(), gains = {};
-      PRODUCTION_KEYS.forEach(res => {
-        gains[res] = (r[res] || 0) * effective; state[res] += gains[res];
-        recordProduction(res, gains[res]);
+    function applyOffline(fromTime = Number(state.lastSave)) {
+      const now = Date.now();
+      const elapsed = (now - Number(fromTime)) / 1000;
+      if (!Number.isFinite(elapsed) || elapsed < 1) {
+        state.lastSave = now;
+        lastTick = now;
+        lastSave = now;
+        saveGame();
+        return;
+      }
+      const seconds = Math.min(elapsed, 8 * 3600);
+      let cursor = now - seconds * 1000;
+      const gains = {};
+      checkProjects(cursor, true);
+
+      const checkpoints = new Set();
+      if (state.projects.active && state.projects.active.endsAt > cursor && state.projects.active.endsAt < now) checkpoints.add(state.projects.active.endsAt);
+      Object.values(state.buffs).forEach(buff => {
+        if (buff && buff.expires > cursor && buff.expires < now) checkpoints.add(buff.expires);
       });
-      processCraft(effective * craftSpeed(), false);
-      offlineReport = { elapsed: seconds, gains };
-      addLog("离线生产报告已生成，离岗期间按 50% 效率结算。");
+      const times = [...checkpoints].sort((a,b) => a-b);
+      times.push(now);
+
+      function applySegment(endTime) {
+        const duration = Math.max(0, (endTime - cursor) / 1000);
+        if (duration > 0) {
+          const effective = duration * .5;
+          const r = getRates(cursor);
+          PRODUCTION_KEYS.forEach(res => {
+            const amount = (r[res] || 0) * effective;
+            state[res] += amount;
+            gains[res] = (gains[res] || 0) + amount;
+            recordProduction(res, amount);
+          });
+          processCraft(effective * craftSpeed(cursor), false);
+        }
+        cursor = endTime;
+        checkProjects(cursor, true);
+        Object.keys(state.buffs).forEach(type => {
+          if (!state.buffs[type] || state.buffs[type].expires <= cursor) delete state.buffs[type];
+        });
+      }
+      times.forEach(applySegment);
+      checkProjects(now, true);
+      if (seconds >= 120) {
+        offlineReport = { elapsed: seconds, gains };
+        addLog("离线生产报告已生成，离岗期间按 50% 效率结算。");
+      } else offlineReport = null;
+      state.lastSave = now;
+      lastTick = now;
+      lastSave = now;
+      saveGame();
     }
     function showOffline() {
       if (!offlineReport) return;
@@ -2524,7 +2640,12 @@
     }
 
     function tick() {
-      const now = Date.now(), dt = Math.min(Math.max(0,(now-lastTick)/1000), 8*3600);
+      const now = Date.now();
+      if (document.hidden) { lastTick = now; return; }
+      const rawDt = Math.min(Math.max(0,(now-lastTick)/1000), 8*3600);
+      const slept = rawDt > 30;
+      if (slept) applyOffline(lastTick);
+      const dt = slept ? 0 : rawDt;
       lastTick = now;
       if (dt > 0) {
         const r = getRates();
@@ -2551,7 +2672,19 @@
     showOffline();
     setInterval(tick, 250);
     window.addEventListener("beforeunload", () => saveGame());
-    document.addEventListener("visibilitychange", () => { if (document.hidden) saveGame(); });
+    let hiddenAt = null;
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        hiddenAt = Date.now();
+        saveGame();
+      } else if (hiddenAt) {
+        lastTick = Date.now();
+        applyOffline();
+        hiddenAt = null;
+        showOffline();
+        saveGame();
+      }
+    });
 
     window.IndustrialGame = { getRates, buildingCost, moduleCost, craftSpeed, newState, QUESTS, BUILDINGS, RECIPES, MODULES, TECHS, POLICIES, LEGACY, prestigeGain };
   </script>
